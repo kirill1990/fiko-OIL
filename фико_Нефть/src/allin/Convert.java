@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
