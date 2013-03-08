@@ -66,9 +66,9 @@ public class Station extends JPanel
 	private String				station_id			= "0";
 
 	private boolean				isChangeTable		= true;
-	
-	private Stations main;
-	private JButton	update_close;
+
+	private Stations			main;
+	private JButton				update_close;
 
 	public Station(Stations _main, final String stationId) throws SQLException
 	{
@@ -409,7 +409,22 @@ public class Station extends JPanel
 		 * ***********************************************************
 		 */
 
-		jDataTable = new JTable();
+		jDataTable = new JTable()
+		{
+			private static final long	serialVersionUID	= 1L;
+
+			/*
+			 * Запрет на редактирование 1 ячейки(ID)
+			 */
+			@Override
+			public boolean isCellEditable(int row, int column)
+			{
+				if (column > 0)
+					return true;
+				else
+					return false;
+			}
+		};
 
 		table.add(new JScrollPane(jDataTable));
 
@@ -442,7 +457,6 @@ public class Station extends JPanel
 						public void actionPerformed(ActionEvent e)
 						{
 							// Сообщение
-
 							// варианты ответа пользователя
 							String[] choices = { "Да", "Нет" };
 
@@ -471,15 +485,20 @@ public class Station extends JPanel
 										try
 										{
 											DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("DELETE FROM change WHERE id = '" + id + "';");
-
-											refreshCostOil();
 										}
 										catch (SQLException e1)
 										{
 											e1.printStackTrace();
 										}
 									}
-
+									try
+									{
+										refreshCostOil();
+									}
+									catch (SQLException e1)
+									{
+										e1.printStackTrace();
+									}
 									break;
 								case 1:
 									// ничего не удаляем
@@ -535,7 +554,6 @@ public class Station extends JPanel
 				updateTitle(false);
 			}
 
-			
 		});
 
 		update_close = new JButton("Обновить и закрыть");
@@ -550,13 +568,26 @@ public class Station extends JPanel
 			}
 		});
 	}
-	
+
+	/**
+	 * Активация или деактивация кнопок с функционалом "обновить данные"
+	 * 
+	 * @param b
+	 *            - true - активация; false - деактивация
+	 */
 	private void setButtonEnabled(boolean b)
 	{
 		update.setEnabled(b);
 		update_close.setEnabled(b);
 	}
-	
+
+	/**
+	 * Обновление данных поставщика(АЗС не включены).<br>
+	 * + возможность перейти к списку всех АЗС
+	 * 
+	 * @param b
+	 *            - true - с переходом ко всем АЗС; false - без перехода
+	 */
 	private void updateTitle(boolean b)
 	{
 		try
@@ -574,8 +605,8 @@ public class Station extends JPanel
 			DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE station SET comm_id = '" + ((ComboItem) cbComm.getSelectedItem()).getValue() + "' WHERE id LIKE '" + station_id + "';");
 
 			DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE station SET active = '" + ((ComboItem) cbStatus.getSelectedItem()).getValue() + "' WHERE id LIKE '" + station_id + "';");
-		
-			if(b)
+
+			if (b)
 			{
 				main.ini();
 			}
@@ -587,6 +618,17 @@ public class Station extends JPanel
 		}
 	}
 
+	/**
+	 * Обновление данных в таблице цен + последнее обновление<br>
+	 * - id<br>
+	 * - Дата<br>
+	 * - АИ - 80<br>
+	 * - АИ - 92<br>
+	 * - АИ - 95<br>
+	 * - Дизель<br>
+	 * 
+	 * @throws SQLException
+	 */
 	private void refreshCostOil() throws SQLException
 	{
 		isChangeTable = false;
@@ -621,7 +663,7 @@ public class Station extends JPanel
 				item.add(time.getString(4));
 				item.add(time.getString(5));
 
-				values.add(item);
+				values.add(0, item);
 			}
 			time.close();
 		}
@@ -640,7 +682,7 @@ public class Station extends JPanel
 		jDataTable.getColumnModel().getColumn(4).setMinWidth(40);
 		jDataTable.getColumnModel().getColumn(5).setMinWidth(40);
 
-		jDataTable.getModel().addTableModelListener(new aa());
+		jDataTable.getModel().addTableModelListener(new JTableChanged());
 		isChangeTable = true;
 
 		/*
@@ -682,51 +724,67 @@ public class Station extends JPanel
 		text_b95.setText(b95);
 		text_b92.setText(b92);
 		text_b80.setText(b80);
-
+		
+		jDataTable.setAutoCreateRowSorter(true);
+		
 		this.validate();
 		this.repaint();
 
 	}
 
-	private class aa implements TableModelListener
+	/**
+	 * Обновление бд, после изменения значения в таблице
+	 * 
+	 * @author kirill
+	 * 
+	 */
+	private class JTableChanged implements TableModelListener
 	{
 
 		@Override
 		public void tableChanged(TableModelEvent e)
 		{
+			/*
+			 * isChangeTable - возмодность обновление данных
+			 * Необходим, чтобы избежать некорректного запроса к таблице,
+			 * во время её обновления методом refreshCostOil()
+			 */
 			if (isChangeTable)
 			{
-				String id = jDataTable.getModel().getValueAt(e.getFirstRow(), 0).toString();
-				String b80 = jDataTable.getModel().getValueAt(e.getFirstRow(), 2).toString();
-				String b92 = jDataTable.getModel().getValueAt(e.getFirstRow(), 3).toString();
-				String b95 = jDataTable.getModel().getValueAt(e.getFirstRow(), 4).toString();
-				String bdis = jDataTable.getModel().getValueAt(e.getFirstRow(), 5).toString();
-
-				try
+				if (e.getColumn() > 0)
 				{
-					SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+					String id = jDataTable.getModel().getValueAt(e.getFirstRow(), 0).toString();
+					String b80 = jDataTable.getModel().getValueAt(e.getFirstRow(), 2).toString();
+					String b92 = jDataTable.getModel().getValueAt(e.getFirstRow(), 3).toString();
+					String b95 = jDataTable.getModel().getValueAt(e.getFirstRow(), 4).toString();
+					String bdis = jDataTable.getModel().getValueAt(e.getFirstRow(), 5).toString();
+					
+					try
+					{
+						SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 
-					Date date = formatter.parse(jDataTable.getModel().getValueAt(e.getFirstRow(), 1).toString());
-					String changedate = Long.toString(date.getTime());
+						Date date = formatter.parse(jDataTable.getModel().getValueAt(e.getFirstRow(), 1).toString());
+						String changedate = Long.toString(date.getTime());
 
-					DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET b80 = '" + b80 + "' WHERE id LIKE '" + id + "';");
+						DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET b80 = '" + b80 + "' WHERE id LIKE '" + id + "';");
 
-					DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET b92 = '" + b92 + "' WHERE id LIKE '" + id + "';");
+						DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET b92 = '" + b92 + "' WHERE id LIKE '" + id + "';");
 
-					DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET b95 = '" + b95 + "' WHERE id LIKE '" + id + "';");
+						DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET b95 = '" + b95 + "' WHERE id LIKE '" + id + "';");
 
-					DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET bdis = '" + bdis + "' WHERE id LIKE '" + id + "';");
+						DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET bdis = '" + bdis + "' WHERE id LIKE '" + id + "';");
 
-					DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET changedate = '" + changedate + "' WHERE id LIKE '" + id + "';");
-				}
-				catch (SQLException e1)
-				{
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				catch (ParseException e1)
-				{
-					JOptionPane.showMessageDialog(null, "Ошибка в дате, обновление отменено!");
+						DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET changedate = '" + changedate + "' WHERE id LIKE '" + id + "';");
+					}
+					catch (SQLException e1)
+					{
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					catch (ParseException e1)
+					{
+						JOptionPane.showMessageDialog(null, "Ошибка в дате, обновление отменено!");
+					}
 				}
 			}
 		}

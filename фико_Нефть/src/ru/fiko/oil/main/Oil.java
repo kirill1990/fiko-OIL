@@ -13,6 +13,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import ru.fiko.oil.panels.Citys;
+import ru.fiko.oil.panels.Districts;
 import ru.fiko.oil.panels.Stations;
 
 public class Oil extends JFrame
@@ -27,8 +29,6 @@ public class Oil extends JFrame
 	private static Connection	conn				= null;
 	private static Statement	stat				= null;
 
-	// private ResultSet rs = null;
-	// private PreparedStatement pst = null;
 
 	public Oil() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
 	{
@@ -57,13 +57,22 @@ public class Oil extends JFrame
 				System.exit(0);
 			}
 		});
+		
+		/*
+		 * Заполнение формы
+		 */
 
 		JTabbedPane jtp = new JTabbedPane();
-		jtp.setTabPlacement(JTabbedPane.LEFT);
-
-		jtp.add("АЗС", new Stations());
-
 		getContentPane().add(jtp);
+//		jtp.setTabPlacement(JTabbedPane.LEFT);
+
+		jtp.add("Города", new Citys());
+		
+		jtp.add("Поставщики", new Stations());
+		
+		jtp.add("Районы", new Districts());
+
+
 		validate();
 	}
 

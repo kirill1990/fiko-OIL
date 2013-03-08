@@ -19,8 +19,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -47,6 +49,10 @@ public class Stations extends JPanel
 	private JComboBox			cbDistrict			= null;
 	private JComboBox			cbComm				= null;
 
+	// Индексы последних изменений, выпадающих списков
+	private int					indexDistrict		= 0;
+	private int					indexComm			= 0;
+
 	public Stations() throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.sqlite.JDBC");
@@ -54,6 +60,11 @@ public class Stations extends JPanel
 		ini();
 	}
 
+	/**
+	 * Инициализицаия панели
+	 * 
+	 * @throws SQLException
+	 */
 	public void ini() throws SQLException
 	{
 		this.removeAll();
@@ -151,12 +162,16 @@ public class Stations extends JPanel
 			while (rs.next())
 				cbDistrict.addItem(new ComboItem(rs.getString(1), rs.getString(2)));
 
+			if (indexDistrict < cbDistrict.getItemCount())
+				cbDistrict.setSelectedIndex(indexDistrict);
+
 			comboPanel.add(cbDistrict);
 
 			cbDistrict.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
+					indexDistrict = cbDistrict.getSelectedIndex();
 					try
 					{
 						refreshTable();
@@ -181,12 +196,16 @@ public class Stations extends JPanel
 			while (rs.next())
 				cbComm.addItem(new ComboItem(rs.getString(1), rs.getString(2)));
 
+			if (indexComm < cbComm.getItemCount())
+				cbComm.setSelectedIndex(indexComm);
+
 			comboPanel.add(cbComm);
 
 			cbComm.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
+					indexComm = cbComm.getSelectedIndex();
 					try
 					{
 						refreshTable();
@@ -369,13 +388,94 @@ public class Stations extends JPanel
 				{
 					try
 					{
-						String id = jDataTable.getValueAt(jDataTable.getSelectedRow(), 0).toString();
-						editableStation(id);
+						if (jDataTable.getSelectedRow() > -1)
+						{
+							String id = jDataTable.getValueAt(jDataTable.getSelectedRow(), 0).toString();
+							editableStation(id);
+						}
 					}
 					catch (SQLException e1)
 					{
 						e1.printStackTrace();
 					}
+				}
+			}
+		});
+		
+		jDataTable.addMouseListener(new MouseAdapter()
+		{
+			public void mouseReleased(MouseEvent Me)
+			{
+				if (0 < jDataTable.getSelectedRows().length && Me.isMetaDown())
+				{
+					JPopupMenu Pmenu = new JPopupMenu();
+
+					// удаляем выделенные элементы
+					JMenuItem activeRecords = new JMenuItem("Активировать:" + jDataTable.getSelectedRows().length);
+					Pmenu.add(activeRecords);
+					
+					JMenuItem deactiveRecords = new JMenuItem("Деактивировать:" + jDataTable.getSelectedRows().length);
+					Pmenu.add(deactiveRecords);
+
+					// показываем PopUp меню
+					Pmenu.show(Me.getComponent(), Me.getX(), Me.getY());
+
+					// удаление записей
+					activeRecords.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+									for (int i = 0; i < jDataTable.getSelectedRows().length; i++)
+									{
+										String id = jDataTable.getValueAt(jDataTable.getSelectedRows()[i], 0).toString();
+
+										try
+										{
+											DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE station SET active = 'true' WHERE id LIKE '" + id + "';");
+										}
+										catch (SQLException e1)
+										{
+											e1.printStackTrace();
+										}
+									}
+									try
+									{
+										refreshTable();
+									}
+									catch (SQLException e1)
+									{
+										e1.printStackTrace();
+									}
+						}
+					});
+					
+					deactiveRecords.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+									for (int i = 0; i < jDataTable.getSelectedRows().length; i++)
+									{
+										String id = jDataTable.getValueAt(jDataTable.getSelectedRows()[i], 0).toString();
+
+										try
+										{
+											DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE station SET active = 'false' WHERE id LIKE '" + id + "';");
+										}
+										catch (SQLException e1)
+										{
+											e1.printStackTrace();
+										}
+									}
+									try
+									{
+										refreshTable();
+									}
+									catch (SQLException e1)
+									{
+										e1.printStackTrace();
+									}
+						}
+					});
 				}
 			}
 		});
@@ -503,11 +603,17 @@ public class Stations extends JPanel
 		this.repaint();
 	}
 
+	/**
+	 * Удаление поставщика со всеми ценами
+	 * 
+	 * @param station_id - id удаляемого поставщика
+	 * @throws SQLException
+	 */
 	private void delStation(String station_id) throws SQLException
 	{
 		DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("DELETE FROM change WHERE station_id = '" + station_id + "';");
 		DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("DELETE FROM station WHERE id = '" + station_id + "';");
-	
+
 		refreshTable();
 	}
 }
