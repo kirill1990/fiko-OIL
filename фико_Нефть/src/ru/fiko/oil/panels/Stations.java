@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.FileNotFoundException;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,23 +19,22 @@ import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
+import ru.fiko.oil.data.OutputData;
 import ru.fiko.oil.main.Oil;
 import ru.fiko.oil.supp.ComboItem;
 
 /**
- * Панель с данными по АЗС
+ * Панель с данными по "Поставщикам"
  * 
  * @author kirill
  * 
@@ -43,7 +43,6 @@ public class Stations extends JPanel
 {
 	private static final long	serialVersionUID	= 1L;
 
-	private JTextField			jSearchTextField	= null;
 	private JTable				jDataTable			= null;
 
 	private JComboBox			cbDistrict			= null;
@@ -73,72 +72,6 @@ public class Stations extends JPanel
 
 		JPanel toolsPanel = new JPanel(new BorderLayout(5, 5));
 		this.add(toolsPanel, BorderLayout.NORTH);
-
-		/*
-		 * ***********************************************************
-		 * Строка поиска, фильтр по:
-		 * - названию АЗС
-		 * - адресу месторасположения
-		 * ***********************************************************
-		 */
-		JPanel searchPanel = new JPanel(new BorderLayout(5, 5));
-		// toolsPanel.add(searchPanel, BorderLayout.NORTH);
-
-		// Надпись перед поиском
-		searchPanel.add(new JLabel("Поиск:"), BorderLayout.WEST);
-
-		// текстовое поле для ввода данных поиска
-		jSearchTextField = new JTextField();
-		searchPanel.add(jSearchTextField, BorderLayout.CENTER);
-		jSearchTextField.getDocument().addDocumentListener(new DocumentListener()
-		{
-
-			public void changedUpdate(DocumentEvent e)
-			{
-				try
-				{
-					updateSearchString();
-				}
-				catch (SQLException e1)
-				{
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-
-			public void removeUpdate(DocumentEvent e)
-			{
-				try
-				{
-					updateSearchString();
-				}
-				catch (SQLException e1)
-				{
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-
-			public void insertUpdate(DocumentEvent e)
-			{
-				try
-				{
-					updateSearchString();
-				}
-				catch (SQLException e1)
-				{
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-
-			public void updateSearchString() throws SQLException
-			{
-				refreshTable();
-
-				validate();
-			}
-		});
 
 		/*
 		 * ***********************************************************
@@ -231,7 +164,7 @@ public class Stations extends JPanel
 		JPanel btnPanel = new JPanel(new BorderLayout());
 
 		JPanel temp_btnPanel = new JPanel(new BorderLayout());
-		temp_btnPanel.add(btnPanel, BorderLayout.EAST);
+		// temp_btnPanel.add(btnPanel, BorderLayout.EAST);
 
 		toolsPanel.add(temp_btnPanel, BorderLayout.SOUTH);
 
@@ -380,6 +313,7 @@ public class Stations extends JPanel
 			}
 		};
 
+		//Двойной клик
 		jDataTable.addMouseListener(new MouseAdapter()
 		{
 			public void mouseClicked(MouseEvent e)
@@ -401,82 +335,219 @@ public class Stations extends JPanel
 				}
 			}
 		});
-		
+
+		// PopUP
 		jDataTable.addMouseListener(new MouseAdapter()
 		{
 			public void mouseReleased(MouseEvent Me)
 			{
+				JPopupMenu Pmenu = new JPopupMenu();
+
+				// Вывод инфморации
+				JMenuItem output = new JMenuItem("Вывод в xml");
+				Pmenu.add(output);
+				
+
+				// Разделитель
+				JMenuItem _Records = new JMenuItem("----------");
+				Pmenu.add(_Records);
+
+				// Добавление новой станции
+				JMenuItem addRecords = new JMenuItem("Добавить станцию");
+				Pmenu.add(addRecords);
+				
+				output.addActionListener(new ActionListener()
+				{
+					
+					@Override
+					public void actionPerformed(ActionEvent arg0)
+					{
+						try
+						{
+							new OutputData();
+						}
+						catch (FileNotFoundException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						catch (ClassNotFoundException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						catch (ParserConfigurationException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						catch (TransformerException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						catch (SQLException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						JOptionPane.showMessageDialog(null, "Готово");
+					}
+				});
+
+				// Добавление новой станции
+				addRecords.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						try
+						{
+							PreparedStatement pst = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).prepareStatement("INSERT INTO station VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+
+							pst.setInt(2, 0);
+
+							pst.setInt(3, 0);
+
+							pst.setInt(4, 5);
+
+							pst.setString(5, "false");
+
+							pst.setString(6, "Новая");
+							pst.setString(7, "Новая");
+							pst.setString(8, "Новая");
+
+							pst.addBatch();
+							pst.executeBatch();
+							pst.close();
+
+							refreshTable();
+						}
+						catch (SQLException e1)
+						{
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				});
+
 				if (0 < jDataTable.getSelectedRows().length && Me.isMetaDown())
 				{
-					JPopupMenu Pmenu = new JPopupMenu();
 
-					// удаляем выделенные элементы
+					// Удаление станции
+					JMenuItem deletRecords = new JMenuItem("Удалить:" + jDataTable.getSelectedRows().length);
+					Pmenu.add(deletRecords);
+
+					// Активация станции
 					JMenuItem activeRecords = new JMenuItem("Активировать:" + jDataTable.getSelectedRows().length);
 					Pmenu.add(activeRecords);
-					
+
+					// Деактивация станции
 					JMenuItem deactiveRecords = new JMenuItem("Деактивировать:" + jDataTable.getSelectedRows().length);
 					Pmenu.add(deactiveRecords);
 
 					// показываем PopUp меню
 					Pmenu.show(Me.getComponent(), Me.getX(), Me.getY());
 
-					// удаление записей
+					// Удаление станции
+					deletRecords.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							String[] choices = { "Да", "Нет" };
+
+							// создание сообщения
+							int response = JOptionPane.showOptionDialog(null // В
+																				// центре
+																				// окна
+							, "Вы уверены, что хотите удалить?" // Сообщение
+							, "" // Титульник сообщения
+							, JOptionPane.YES_NO_OPTION // Option type
+							, JOptionPane.PLAIN_MESSAGE // messageType
+							, null // Icon (none)
+							, choices // Button text as above.
+							, "" // Default button's labelF
+							);
+
+							// обработка ответа пользователя
+							switch (response)
+							{
+								case 0:
+									try
+									{
+										// удаление
+										for (int i = 0; i < jDataTable.getSelectedRows().length; i++)
+										{
+											String id = jDataTable.getValueAt(jDataTable.getSelectedRows()[i], 0).toString();
+
+											delStation(id);
+										}
+										refreshTable();
+									}
+									catch (SQLException e1)
+									{
+										e1.printStackTrace();
+									}
+									break;
+								case 1:
+									// ничего не удаляем
+									break;
+								case -1:
+									// окно было закрыто - ничего не удаляем
+								default:
+									break;
+							}
+
+						}
+					});
+
+					// Активация станции
 					activeRecords.addActionListener(new ActionListener()
 					{
 						public void actionPerformed(ActionEvent e)
 						{
-									for (int i = 0; i < jDataTable.getSelectedRows().length; i++)
-									{
-										String id = jDataTable.getValueAt(jDataTable.getSelectedRows()[i], 0).toString();
+							try
+							{
+								for (int i = 0; i < jDataTable.getSelectedRows().length; i++)
+								{
+									String id = jDataTable.getValueAt(jDataTable.getSelectedRows()[i], 0).toString();
 
-										try
-										{
-											DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE station SET active = 'true' WHERE id LIKE '" + id + "';");
-										}
-										catch (SQLException e1)
-										{
-											e1.printStackTrace();
-										}
-									}
-									try
-									{
-										refreshTable();
-									}
-									catch (SQLException e1)
-									{
-										e1.printStackTrace();
-									}
+									DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE station SET active = 'true' WHERE id LIKE '" + id + "';");
+								}
+								refreshTable();
+							}
+							catch (SQLException e1)
+							{
+								e1.printStackTrace();
+							}
 						}
 					});
-					
+
+					// Деактивация станции
 					deactiveRecords.addActionListener(new ActionListener()
 					{
 						public void actionPerformed(ActionEvent e)
 						{
-									for (int i = 0; i < jDataTable.getSelectedRows().length; i++)
-									{
-										String id = jDataTable.getValueAt(jDataTable.getSelectedRows()[i], 0).toString();
+							try
+							{
+								for (int i = 0; i < jDataTable.getSelectedRows().length; i++)
+								{
+									String id = jDataTable.getValueAt(jDataTable.getSelectedRows()[i], 0).toString();
 
-										try
-										{
-											DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE station SET active = 'false' WHERE id LIKE '" + id + "';");
-										}
-										catch (SQLException e1)
-										{
-											e1.printStackTrace();
-										}
-									}
-									try
-									{
-										refreshTable();
-									}
-									catch (SQLException e1)
-									{
-										e1.printStackTrace();
-									}
+									DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE station SET active = 'false' WHERE id LIKE '" + id + "';");
+								}
+								refreshTable();
+							}
+							catch (SQLException e1)
+							{
+								e1.printStackTrace();
+							}
 						}
 					});
 				}
+
+				if (Me.isMetaDown())
+					Pmenu.show(Me.getComponent(), Me.getX(), Me.getY());
 			}
 		});
 
@@ -606,7 +677,8 @@ public class Stations extends JPanel
 	/**
 	 * Удаление поставщика со всеми ценами
 	 * 
-	 * @param station_id - id удаляемого поставщика
+	 * @param station_id
+	 *            - id удаляемого поставщика
 	 * @throws SQLException
 	 */
 	private void delStation(String station_id) throws SQLException

@@ -3,6 +3,7 @@ package ru.fiko.oil.main;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,11 +13,20 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import ru.fiko.oil.panels.Citys;
 import ru.fiko.oil.panels.Districts;
 import ru.fiko.oil.panels.Stations;
 
+/**
+ * 
+ * 
+ * 
+ * @author kirill
+ *
+ */
 public class Oil extends JFrame
 {
 	private static final long	serialVersionUID	= 7076741630948996202L;
@@ -28,7 +38,6 @@ public class Oil extends JFrame
 
 	private static Connection	conn				= null;
 	private static Statement	stat				= null;
-
 
 	public Oil() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
 	{
@@ -66,11 +75,10 @@ public class Oil extends JFrame
 		getContentPane().add(jtp);
 //		jtp.setTabPlacement(JTabbedPane.LEFT);
 
-		jtp.add("Города", new Citys());
 		
 		jtp.add("Поставщики", new Stations());
-		
 		jtp.add("Районы", new Districts());
+		jtp.add("Города", new Citys());
 
 
 		validate();
@@ -85,13 +93,20 @@ public class Oil extends JFrame
 	 * @throws UnsupportedLookAndFeelException
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
+	 * @throws TransformerException 
+	 * @throws ParserConfigurationException 
+	 * @throws FileNotFoundException 
 	 */
-	public static void main(String[] args) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
+	public static void main(String[] args) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, FileNotFoundException, ParserConfigurationException, TransformerException
 	{
 		Class.forName("org.sqlite.JDBC");
 		conn = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH);
 		stat = conn.createStatement();
 
+		/*
+		 * проверка наличие бд.
+		 * если нет, то создаёт новую
+		 */
 		stat.executeUpdate("CREATE TABLE IF NOT EXISTS district(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, title STRING, glava_fio STRING, glava_tel STRING, zam_fio STRING, zam_tel STRING);");
 
 		stat.executeUpdate("CREATE TABLE IF NOT EXISTS commercial(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, title STRING);");
@@ -105,6 +120,8 @@ public class Oil extends JFrame
 		stat.executeUpdate("CREATE TABLE IF NOT EXISTS change(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, station_id INTEGER REFERENCES station(id) ON UPDATE CASCADE ON DELETE CASCADE, changedate STRING, b80 STRING, b92 STRING, b95 STRING, bdis STRING);");
 
 		new Oil();
+		
+//		new OutputData();
 		
 
 		// ConnectionToBD bd = new ConnectionToBD();

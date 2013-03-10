@@ -13,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
-import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -25,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -73,16 +73,9 @@ public class Convert extends JFrame
 	JButton						jBrowseFile			= null;
 	JButton						jBrowseFolder		= null;
 
-	public Convert()
+	public Convert() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
 	{
-
-		try
-		{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch (Exception e)
-		{
-		}
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		setSize(WIDTH, HEIGHT);
@@ -818,8 +811,12 @@ public class Convert extends JFrame
 
 	/**
 	 * @param args
+	 * @throws UnsupportedLookAndFeelException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException 
 	 */
-	public static void main(String[] args)
+	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
 	{
 		// TODO Auto-generated method stub
 		// convertClients();
