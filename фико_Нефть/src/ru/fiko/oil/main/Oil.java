@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerException;
 
 import ru.fiko.oil.panels.Citys;
 import ru.fiko.oil.panels.Districts;
+import ru.fiko.oil.panels.Main;
 import ru.fiko.oil.panels.Stations;
 
 /**
@@ -77,6 +78,7 @@ public class Oil extends JFrame
 
 		
 		jtp.add("Поставщики", new Stations());
+		jtp.add("Main", new Main());
 		jtp.add("Районы", new Districts());
 		jtp.add("Города", new Citys());
 
@@ -119,12 +121,16 @@ public class Oil extends JFrame
 
 		stat.executeUpdate("CREATE TABLE IF NOT EXISTS change(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, station_id INTEGER REFERENCES station(id) ON UPDATE CASCADE ON DELETE CASCADE, changedate STRING, b80 STRING, b92 STRING, b95 STRING, bdis STRING);");
 
+		stat.executeUpdate("CREATE TABLE IF NOT EXISTS main(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, texturl STRING, url STRING, text STRING, bname STRING, baddress STRING, b80 STRING, b92 STRING, b95 STRING, bdis STRING, binfo STRING, orgname STRING, orgaddress STRING);");
+		
+		
+		
 		new Oil();
 		
 //		new OutputData();
 		
 
-		// ConnectionToBD bd = new ConnectionToBD();
+//		 ConnectionToBD bd = new ConnectionToBD();
 
 //		try
 //		{

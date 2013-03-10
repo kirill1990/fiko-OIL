@@ -73,6 +73,15 @@ public class ConnectionToBD
 			rs = stat.executeQuery("select * from district;");
 			while (rs.next())
 				System.out.println(rs.getString(2));
+			
+//			pst = conn.prepareStatement("INSERT INTO main VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+//			
+//			for(int i=2;i<14;i++)
+//				pst.setString(i, "");
+//
+//			pst.addBatch();
+//
+//			pst.executeBatch();
 		}
 		catch (SQLException e)
 		{

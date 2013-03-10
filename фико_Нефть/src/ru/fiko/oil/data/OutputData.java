@@ -38,6 +38,7 @@ public class OutputData
 		Class.forName("org.sqlite.JDBC");
 		regions();
 		providers();
+		_main();
 //		clients();
 	}
 
@@ -94,6 +95,97 @@ public class OutputData
 
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
 		Result res = new StreamResult(new FileOutputStream(pathFolder + "regions.xml"));
+		transformer.transform(new DOMSource(doc), res);
+		res = null;
+	}
+	
+	private void _main() throws ParserConfigurationException, FileNotFoundException, TransformerException, SQLException
+	{
+		// Создаём хмл файл
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+
+		Document doc = builder.newDocument();
+
+		doc.setXmlVersion("1.0");
+		doc.setXmlStandalone(true);
+
+		Element main = doc.createElement("main");
+		main.setAttribute("name", "Интерактивная карта калужской области");
+
+		ResultSet rs = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeQuery("SELECT * FROM main;");
+
+		if (rs.next())
+		{
+			Element url_btn = doc.createElement("url_btn");
+			url_btn.setAttribute("texturl", rs.getString("texturl"));
+			url_btn.setAttribute("url", rs.getString("url"));
+			main.appendChild(url_btn);
+			
+			Element url_refresh = doc.createElement("url_refresh");
+			url_refresh.setAttribute("text", rs.getString("text"));
+			main.appendChild(url_refresh);
+			
+
+			Element text_all = doc.createElement("text_all");
+			
+			Element basic = doc.createElement("basic");
+
+			Element nameCol = doc.createElement("nameCol");
+			nameCol.setTextContent(rs.getString("bname"));
+			basic.appendChild(nameCol);
+			
+			Element address = doc.createElement("address");
+			address.setTextContent(rs.getString("baddress"));
+			basic.appendChild(address);
+			
+			Element b80 = doc.createElement("b80");
+			b80.setTextContent(rs.getString("b80"));
+			basic.appendChild(b80);
+			
+			Element b92 = doc.createElement("b92");
+			b92.setTextContent(rs.getString("b92"));
+			basic.appendChild(b92);
+			
+			Element b95 = doc.createElement("b95");
+			b95.setTextContent(rs.getString("b95"));
+			basic.appendChild(b95);
+			
+			Element bdis = doc.createElement("bdis");
+			bdis.setTextContent(rs.getString("bdis"));
+			basic.appendChild(bdis);
+			
+			Element binfo = doc.createElement("info");
+			binfo.setTextContent(rs.getString("binfo"));
+			basic.appendChild(binfo);
+		
+			text_all.appendChild(basic);
+
+			Element client = doc.createElement("client");
+			
+			
+			
+			Element nameCol2 = doc.createElement("nameCol");
+			nameCol2.setTextContent(rs.getString("orgname"));
+			client.appendChild(nameCol2);
+			
+			Element address2 = doc.createElement("address");
+			address2.setTextContent(rs.getString("orgaddress"));
+			client.appendChild(address2);
+
+			text_all.appendChild(client);
+			main.appendChild(text_all);
+			
+			Element anno_htmlText = doc.createElement("anno_htmlText");
+			anno_htmlText.setAttribute("textanno", "[ Справочная информация ]");
+			main.appendChild(anno_htmlText);
+		}
+		rs.close();
+
+		doc.appendChild(main);
+
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		Result res = new StreamResult(new FileOutputStream(pathFolder + "main.xml"));
 		transformer.transform(new DOMSource(doc), res);
 		res = null;
 	}
