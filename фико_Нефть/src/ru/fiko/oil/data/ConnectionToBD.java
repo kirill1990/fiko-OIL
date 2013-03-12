@@ -39,6 +39,8 @@ import jxl.read.biff.BiffException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import ru.fiko.oil.main.Oil;
+
 public class ConnectionToBD
 {
 	private Connection			conn	= null;
@@ -54,25 +56,27 @@ public class ConnectionToBD
 			conn = DriverManager.getConnection("jdbc:sqlite:oil.db");
 			stat = conn.createStatement();
 
-			stat.executeUpdate("CREATE TABLE IF NOT EXISTS district(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, title STRING, glava_fio STRING, glava_tel STRING, zam_fio STRING, zam_tel STRING);");
-
-			stat.executeUpdate("CREATE TABLE IF NOT EXISTS commercial(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, title STRING);");
-
-			stat.executeUpdate("CREATE TABLE IF NOT EXISTS city(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, title STRING, x STRING, y STRING);");
-
-			stat.executeUpdate("CREATE TABLE IF NOT EXISTS client(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, city_id INTEGER REFERENCES city(id) ON UPDATE CASCADE ON DELETE CASCADE, title STRING, address STRING);");
-
-			stat.executeUpdate("CREATE TABLE IF NOT EXISTS station(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, city_id INTEGER REFERENCES city(id) ON UPDATE CASCADE ON DELETE CASCADE, comm_id INTEGER REFERENCES commercial(id) ON UPDATE CASCADE , active STRING, title STRING, address STRING, tel STRING);");
-
-			stat.executeUpdate("CREATE TABLE IF NOT EXISTS change(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, station_id INTEGER REFERENCES station(id) ON UPDATE CASCADE ON DELETE CASCADE, changedate STRING, b80 STRING, b92 STRING, b95 STRING, bdis STRING);");
-
+//			stat.executeUpdate("CREATE TABLE IF NOT EXISTS district(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, title STRING, glava_fio STRING, glava_tel STRING, zam_fio STRING, zam_tel STRING);");
+//
+//			stat.executeUpdate("CREATE TABLE IF NOT EXISTS commercial(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, title STRING);");
+//
+//			stat.executeUpdate("CREATE TABLE IF NOT EXISTS city(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, title STRING, x STRING, y STRING);");
+//
+//			stat.executeUpdate("CREATE TABLE IF NOT EXISTS client(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, city_id INTEGER REFERENCES city(id) ON UPDATE CASCADE ON DELETE CASCADE, title STRING, address STRING);");
+//
+//			stat.executeUpdate("CREATE TABLE IF NOT EXISTS station(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, city_id INTEGER REFERENCES city(id) ON UPDATE CASCADE ON DELETE CASCADE, comm_id INTEGER REFERENCES commercial(id) ON UPDATE CASCADE , active STRING, title STRING, address STRING, tel STRING);");
+//
+//			stat.executeUpdate("CREATE TABLE IF NOT EXISTS change(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, station_id INTEGER REFERENCES station(id) ON UPDATE CASCADE ON DELETE CASCADE, changedate STRING, b80 STRING, b92 STRING, b95 STRING, bdis STRING);");
+//			for(int station_id=966;station_id<=1541;station_id++)
+//				DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("DELETE FROM change WHERE id = '" + station_id + "';");
+			
 			// add();
 			// client();
-			// pro();
+//			 pro();
 			// stat.executeUpdate("UPDATE title SET id = 100 WHERE id = '2';");
-			rs = stat.executeQuery("select * from district;");
-			while (rs.next())
-				System.out.println(rs.getString(2));
+//			rs = stat.executeQuery("select * from district;");
+//			while (rs.next())
+//				System.out.println(rs.getString(2));
 			
 //			pst = conn.prepareStatement("INSERT INTO main VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
 //			
@@ -392,11 +396,11 @@ public class ConnectionToBD
 
 	private void pro() throws SQLException
 	{
-		File file = new File("карта по бензину_11.01.2013 (1).xls");
+		File file = new File("/home/kirill/Work/Карта Нефть/Карты Excel/8. карта по бензину 11.03.2013 (1).xls");
 		try
 		{
 			SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-			Date date = formatter.parse("11.01.2013");
+			Date date = formatter.parse("11.03.2013");
 
 			WorkbookSettings ws = new WorkbookSettings();
 			ws.setLocale(new Locale("ru", "RU"));

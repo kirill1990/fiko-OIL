@@ -1,6 +1,7 @@
 package ru.fiko.oil.panels;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,8 +11,12 @@ import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import ru.fiko.oil.main.Oil;
 
@@ -33,6 +38,7 @@ public class Main extends JPanel
 	private JTextField			binfo;
 	private JTextField			orgname;
 	private JTextField			orgaddress;
+	private JButton	btn;
 
 	public Main() throws ClassNotFoundException, SQLException
 	{
@@ -40,6 +46,9 @@ public class Main extends JPanel
 
 		this.setLayout(new BorderLayout(5, 5));
 		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+		JPanel panel = new JPanel(new GridLayout(17,1));
+		panel.setPreferredSize(new Dimension(500, 550));
 		
 		ResultSet rs = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeQuery("SELECT * FROM main WHERE id LIKE '1';");
 		if (rs.next())
@@ -59,15 +68,33 @@ public class Main extends JPanel
 			
 			orgname = new JTextField(rs.getString("orgname"));
 			orgaddress = new JTextField(rs.getString("orgaddress"));
-		}
-		rs.close();
 		
+
 		
-		JPanel panel = new JPanel(new GridLayout(13,1));
-		this.add(panel, BorderLayout.NORTH);
+		texturl.getDocument().addDocumentListener(new SearchDocumentListener());
+		url.getDocument().addDocumentListener(new SearchDocumentListener());
+
+		text.getDocument().addDocumentListener(new SearchDocumentListener());
+		bname.getDocument().addDocumentListener(new SearchDocumentListener());
+		baddress.getDocument().addDocumentListener(new SearchDocumentListener());
+		b80.getDocument().addDocumentListener(new SearchDocumentListener());
+		b92.getDocument().addDocumentListener(new SearchDocumentListener());
+		b95.getDocument().addDocumentListener(new SearchDocumentListener());
+		bdis.getDocument().addDocumentListener(new SearchDocumentListener());
+		binfo.getDocument().addDocumentListener(new SearchDocumentListener());
+		JScrollPane aa = new JScrollPane(panel);
+		aa.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		this.add(aa, BorderLayout.CENTER);
+		
+		btn = new JButton("Обновить");
+		btn.setEnabled(false);
+		panel.add(btn);
+		panel.add(new JLabel("Методичка"));
 		panel.add(texturl);
 		panel.add(url);
+		panel.add(new JLabel("Справочная информация"));
 		panel.add(text);
+		panel.add(new JLabel("в таблице АЗС"));
 		panel.add(bname);
 		panel.add(baddress);
 		panel.add(b80);
@@ -75,11 +102,14 @@ public class Main extends JPanel
 		panel.add(b95);
 		panel.add(bdis);
 		panel.add(binfo);
+		panel.add(new JLabel("в таблице  Заказчики"));
 		panel.add(orgname);
 		panel.add(orgaddress);
 		
-		JButton btn = new JButton("Обновить");
-		panel.add(btn);
+
+		}
+		rs.close();
+	
 		
 		btn.addActionListener(new ActionListener()
 		{
@@ -121,6 +151,28 @@ public class Main extends JPanel
 
 			}
 		});
+	}
+	
+	public class SearchDocumentListener implements DocumentListener
+	{
+		public void changedUpdate(DocumentEvent e)
+		{
+			updateSearchString();
+		}
 
+		public void removeUpdate(DocumentEvent e)
+		{
+			updateSearchString();
+		}
+
+		public void insertUpdate(DocumentEvent e)
+		{
+			updateSearchString();
+		}
+
+		public void updateSearchString()
+		{
+			btn.setEnabled(true);
+		}
 	}
 }
