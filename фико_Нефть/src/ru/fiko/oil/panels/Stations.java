@@ -391,8 +391,6 @@ public class Stations extends JPanel
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						
-						JOptionPane.showMessageDialog(null, "Готово");
 					}
 				});
 

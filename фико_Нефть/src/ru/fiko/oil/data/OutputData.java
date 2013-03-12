@@ -3,12 +3,15 @@
  */
 package ru.fiko.oil.data;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,10 +39,24 @@ public class OutputData
 	public OutputData() throws ClassNotFoundException, FileNotFoundException, ParserConfigurationException, TransformerException, SQLException
 	{
 		Class.forName("org.sqlite.JDBC");
-		regions();
-		providers();
-		_main();
-//		clients();
+		// Создание диалога выбора файла
+		JFileChooser fileChooser = new JFileChooser();
+		// Добавление фильтра в диалог выбора файла
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+		fileChooser.showOpenDialog(null);
+		File selectedFile = fileChooser.getSelectedFile();
+		if (selectedFile != null)
+		{
+			// путь записывает в
+			pathFolder = selectedFile.getAbsolutePath() + "/";
+			regions();
+			providers();
+			_main();
+			
+			JOptionPane.showMessageDialog(null, "Готово");
+		}
+		// clients();
 	}
 
 	private void regions() throws ParserConfigurationException, FileNotFoundException, TransformerException, SQLException
@@ -98,7 +115,7 @@ public class OutputData
 		transformer.transform(new DOMSource(doc), res);
 		res = null;
 	}
-	
+
 	private void _main() throws ParserConfigurationException, FileNotFoundException, TransformerException, SQLException
 	{
 		// Создаём хмл файл
@@ -121,61 +138,58 @@ public class OutputData
 			url_btn.setAttribute("texturl", rs.getString("texturl"));
 			url_btn.setAttribute("url", rs.getString("url"));
 			main.appendChild(url_btn);
-			
+
 			Element url_refresh = doc.createElement("url_refresh");
 			url_refresh.setAttribute("text", rs.getString("text"));
 			main.appendChild(url_refresh);
-			
 
 			Element text_all = doc.createElement("text_all");
-			
+
 			Element basic = doc.createElement("basic");
 
 			Element nameCol = doc.createElement("nameCol");
 			nameCol.setTextContent(rs.getString("bname"));
 			basic.appendChild(nameCol);
-			
+
 			Element address = doc.createElement("address");
 			address.setTextContent(rs.getString("baddress"));
 			basic.appendChild(address);
-			
+
 			Element b80 = doc.createElement("b80");
 			b80.setTextContent(rs.getString("b80"));
 			basic.appendChild(b80);
-			
+
 			Element b92 = doc.createElement("b92");
 			b92.setTextContent(rs.getString("b92"));
 			basic.appendChild(b92);
-			
+
 			Element b95 = doc.createElement("b95");
 			b95.setTextContent(rs.getString("b95"));
 			basic.appendChild(b95);
-			
+
 			Element bdis = doc.createElement("bdis");
 			bdis.setTextContent(rs.getString("bdis"));
 			basic.appendChild(bdis);
-			
+
 			Element binfo = doc.createElement("info");
 			binfo.setTextContent(rs.getString("binfo"));
 			basic.appendChild(binfo);
-		
+
 			text_all.appendChild(basic);
 
 			Element client = doc.createElement("client");
-			
-			
-			
+
 			Element nameCol2 = doc.createElement("nameCol");
 			nameCol2.setTextContent(rs.getString("orgname"));
 			client.appendChild(nameCol2);
-			
+
 			Element address2 = doc.createElement("address");
 			address2.setTextContent(rs.getString("orgaddress"));
 			client.appendChild(address2);
 
 			text_all.appendChild(client);
 			main.appendChild(text_all);
-			
+
 			Element anno_htmlText = doc.createElement("anno_htmlText");
 			anno_htmlText.setAttribute("textanno", "[ Справочная информация ]");
 			main.appendChild(anno_htmlText);
@@ -310,6 +324,7 @@ public class OutputData
 		res = null;
 	}
 
+	@SuppressWarnings("unused")
 	private void clients() throws ParserConfigurationException, FileNotFoundException, TransformerException, SQLException
 	{
 		System.out.println(1);
@@ -349,7 +364,7 @@ public class OutputData
 					Element provider = doc.createElement("provider");
 					provider.setAttribute("name", rs_client.getString("title"));
 					provider.setAttribute("address", rs_client.getString("address"));
-					
+
 					// определяем, куда впихнуть поставщика:
 					boolean isCity = false;
 					// если создан города, включаем поставщика в него
