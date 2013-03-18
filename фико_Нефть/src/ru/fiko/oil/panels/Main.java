@@ -142,6 +142,7 @@ public class Main extends JPanel
 					DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE main SET orgname = '" + orgname.getText() + "' WHERE id LIKE '1';");
 					
 					DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE main SET orgaddress = '" + orgaddress.getText() + "' WHERE id LIKE '1';");
+					btn.setEnabled(false);
 				}
 				catch (SQLException e1)
 				{

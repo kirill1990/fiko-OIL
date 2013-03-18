@@ -10,7 +10,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,24 +38,33 @@ public class OutputData
 	public OutputData() throws ClassNotFoundException, FileNotFoundException, ParserConfigurationException, TransformerException, SQLException
 	{
 		Class.forName("org.sqlite.JDBC");
-		// Создание диалога выбора файла
-		JFileChooser fileChooser = new JFileChooser();
-		// Добавление фильтра в диалог выбора файла
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-		fileChooser.showOpenDialog(null);
-		File selectedFile = fileChooser.getSelectedFile();
-		if (selectedFile != null)
-		{
-			// путь записывает в
-			pathFolder = selectedFile.getAbsolutePath() + "/";
-			regions();
-			providers();
-			_main();
-			
-			JOptionPane.showMessageDialog(null, "Готово");
-		}
-		// clients();
+		
+		
+		pathFolder = "карта/xml";
+		new File(pathFolder).mkdirs();
+		pathFolder += "/";
+		regions();
+		providers();
+		_main();
+		JOptionPane.showMessageDialog(null, "Готово");
+//		// Создание диалога выбора файла
+//		JFileChooser fileChooser = new JFileChooser();
+//		// Добавление фильтра в диалог выбора файла
+//		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//
+//		fileChooser.showOpenDialog(null);
+//		File selectedFile = fileChooser.getSelectedFile();
+//		if (selectedFile != null)
+//		{
+//			// путь записывает в
+//			pathFolder = selectedFile.getAbsolutePath() + "/";
+//			regions();
+//			providers();
+//			_main();
+//			
+//			JOptionPane.showMessageDialog(null, "Готово");
+//		}
+//		// clients();
 	}
 
 	private void regions() throws ParserConfigurationException, FileNotFoundException, TransformerException, SQLException

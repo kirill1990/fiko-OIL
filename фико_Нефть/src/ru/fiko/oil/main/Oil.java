@@ -54,8 +54,9 @@ public class Oil extends JFrame
 		// всегда по центру экрана
 		this.setLocation((Toolkit.getDefaultToolkit().getScreenSize().width - WIDTH) / 2, (Toolkit.getDefaultToolkit().getScreenSize().height - HEIGHT) / 2);
 		this.setTitle("Нефтепродукты");
+		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setVisible(true);
-
+		
 		/*
 		 * Уничтожение процесса после закрытия окна
 		 */

@@ -14,24 +14,24 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import ru.fiko.oil.data.OutputData;
 import ru.fiko.oil.main.Oil;
 import ru.fiko.oil.supp.ComboItem;
+import ru.fiko.oil.supp.ListItem;
 
 /**
  * Панель с данными по "Поставщикам"
@@ -43,7 +43,7 @@ public class Stations extends JPanel
 {
 	private static final long	serialVersionUID	= 1L;
 
-	private JTable				jDataTable			= null;
+	private JPanel				table				= null;
 
 	private JComboBox			cbDistrict			= null;
 	private JComboBox			cbComm				= null;
@@ -56,20 +56,30 @@ public class Stations extends JPanel
 	{
 		Class.forName("org.sqlite.JDBC");
 
+		/*
+		 * инициализация панели выведены в отдельный метод за счет
+		 * необходимости переопределение оной, после ухода из меню
+		 * редактирование отдельной станции АЗС
+		 */
 		ini();
 	}
 
 	/**
-	 * Инициализицаия панели
+	 * Инициализицаия панели с АЗС
 	 * 
 	 * @throws SQLException
 	 */
 	public void ini() throws SQLException
 	{
 		this.removeAll();
+
+		// настройки по умолчанию
 		this.setLayout(new BorderLayout());
 		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
+		/*
+		 * Хранит два выпадающих списка для фильтрации АЗС
+		 */
 		JPanel toolsPanel = new JPanel(new BorderLayout(5, 5));
 		this.add(toolsPanel, BorderLayout.NORTH);
 
@@ -107,11 +117,10 @@ public class Stations extends JPanel
 					indexDistrict = cbDistrict.getSelectedIndex();
 					try
 					{
-						refreshTable();
+						refreshDataPanel();
 					}
 					catch (SQLException e1)
 					{
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -141,525 +150,285 @@ public class Stations extends JPanel
 					indexComm = cbComm.getSelectedIndex();
 					try
 					{
-						refreshTable();
+						refreshDataPanel();
 					}
 					catch (SQLException e1)
 					{
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
 			});
 		}
-
-		/*
-		 * ***********************************************************
-		 * Кнопки редактирования АЗС
-		 * - добавление новой азс
-		 * - реактирование
-		 * - удаление
-		 * ***********************************************************
-		 */
-
-		JPanel btnPanel = new JPanel(new BorderLayout());
-
-		JPanel temp_btnPanel = new JPanel(new BorderLayout());
-		// temp_btnPanel.add(btnPanel, BorderLayout.EAST);
-
-		toolsPanel.add(temp_btnPanel, BorderLayout.SOUTH);
-
-		JButton addStation = new JButton("Добавить");
-		JButton changeStation = new JButton("Редактировать");
-		JButton delStation = new JButton("Удалить");
-
-		addStation.addActionListener(new ActionListener()
+		JButton btn = new JButton("Вывод в xml");
+		toolsPanel.add(btn,BorderLayout.EAST);
+		btn.addActionListener(new ActionListener()
 		{
-
+			
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
 				try
 				{
-					PreparedStatement pst = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).prepareStatement("INSERT INTO station VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
-
-					pst.setInt(2, 0);
-
-					pst.setInt(3, 0);
-
-					pst.setInt(4, 5);
-
-					pst.setString(5, "false");
-
-					pst.setString(6, "Новая");
-					pst.setString(7, "Новая");
-					pst.setString(8, "Новая");
-
-					pst.addBatch();
-					pst.executeBatch();
-					pst.close();
-
-					refreshTable();
+					outputDat();
 				}
-				catch (SQLException e)
+				catch (Exception e)
 				{
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		});
 
-		btnPanel.add(addStation, BorderLayout.WEST);
-		btnPanel.add(changeStation, BorderLayout.CENTER);
-		btnPanel.add(delStation, BorderLayout.EAST);
+		// Формирование информации о АЗС
+		refreshDataPanel();
+	}
 
-		changeStation.addActionListener(new ActionListener()
+	/*
+	 * Popup окно
+	 */
+	public class PopUpTable extends MouseAdapter
+	{
+		public void mouseReleased(MouseEvent Me)
 		{
+			JPopupMenu Pmenu = new JPopupMenu();
 
-			@Override
-			public void actionPerformed(ActionEvent arg0)
+			final String station_id = ((ListItem) Me.getComponent()).getStationId();
+
+			// Вывод инфморации
+			JMenuItem output = new JMenuItem("Вывод в xml");
+			Pmenu.add(output);
+
+			// Разделитель
+			JMenuItem _Records = new JMenuItem("Редактировать");
+			Pmenu.add(_Records);
+
+			// Добавление новой станции
+			JMenuItem addRecords = new JMenuItem("Добавить станцию");
+			Pmenu.add(addRecords);
+
+			_Records.addActionListener(new ActionListener()
 			{
-				if (jDataTable.getSelectedRows().length > 0)
+
+				@Override
+				public void actionPerformed(ActionEvent arg0)
 				{
 					try
 					{
-						String id = jDataTable.getValueAt(jDataTable.getSelectedRow(), 0).toString();
-						editableStation(id);
+						editableStation(station_id);
 					}
 					catch (SQLException e)
 					{
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-			}
-		});
+			});
 
-		delStation.addActionListener(new ActionListener()
-		{
-
-			@Override
-			public void actionPerformed(ActionEvent e)
+			output.addActionListener(new ActionListener()
 			{
-				if (jDataTable.getSelectedRows().length > 0)
-				{
-					String[] choices = { "Да", "Нет" };
 
-					// создание сообщения
-					int response = JOptionPane.showOptionDialog(null // В
-																		// центре
-																		// окна
-					, "Вы уверены, что хотите удалить?" // Сообщение
-					, "" // Титульник сообщения
-					, JOptionPane.YES_NO_OPTION // Option type
-					, JOptionPane.PLAIN_MESSAGE // messageType
-					, null // Icon (none)
-					, choices // Button text as above.
-					, "" // Default button's labelF
-					);
-
-					// обработка ответа пользователя
-					switch (response)
-					{
-						case 0:
-							// удаление
-							for (int i = 0; i < jDataTable.getSelectedRows().length; i++)
-							{
-								String id = jDataTable.getValueAt(jDataTable.getSelectedRows()[i], 0).toString();
-
-								try
-								{
-									delStation(id);
-								}
-								catch (SQLException e1)
-								{
-									e1.printStackTrace();
-								}
-							}
-
-							break;
-						case 1:
-							// ничего не удаляем
-							break;
-						case -1:
-							// окно было закрыто - ничего не удаляем
-						default:
-							break;
-					}
-
-				}
-			}
-		});
-
-		/*
-		 * ***********************************************************
-		 * Таблица данных
-		 * ***********************************************************
-		 */
-
-		JPanel tablePanel = new JPanel(new GridLayout(1, 1, 5, 0));
-		this.add(tablePanel, BorderLayout.CENTER);
-
-		jDataTable = new JTable()
-		{
-			private static final long	serialVersionUID	= 1L;
-
-			/*
-			 * Запрет на редактирование ячеек
-			 */
-			@Override
-			public boolean isCellEditable(int row, int column)
-			{
-				return false;
-			}
-		};
-
-		//Двойной клик
-		jDataTable.addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent e)
-			{
-				if (e.getClickCount() == 2)
+				@Override
+				public void actionPerformed(ActionEvent arg0)
 				{
 					try
 					{
-						if (jDataTable.getSelectedRow() > -1)
-						{
-							String id = jDataTable.getValueAt(jDataTable.getSelectedRow(), 0).toString();
-							editableStation(id);
-						}
+						outputDat();
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			});
+
+			// Добавление новой станции
+			addRecords.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					try
+					{
+						PreparedStatement pst = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).prepareStatement("INSERT INTO station VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+
+						pst.setInt(2, 0);
+
+						pst.setInt(3, 0);
+
+						pst.setInt(4, 5);
+
+						pst.setString(5, "false");
+
+						pst.setString(6, "Новая");
+						pst.setString(7, "Новая");
+						pst.setString(8, "Новая");
+
+						pst.addBatch();
+						pst.executeBatch();
+						pst.close();
+
+						refreshDataPanel();
 					}
 					catch (SQLException e1)
 					{
 						e1.printStackTrace();
 					}
 				}
-			}
-		});
+			});
 
-		// PopUP
-		jDataTable.addMouseListener(new MouseAdapter()
-		{
-			public void mouseReleased(MouseEvent Me)
-			{
-				JPopupMenu Pmenu = new JPopupMenu();
-
-				// Вывод инфморации
-				JMenuItem output = new JMenuItem("Вывод в xml");
-				Pmenu.add(output);
-				
-
-				// Разделитель
-				JMenuItem _Records = new JMenuItem("----------");
-				Pmenu.add(_Records);
-
-				// Добавление новой станции
-				JMenuItem addRecords = new JMenuItem("Добавить станцию");
-				Pmenu.add(addRecords);
-				
-				output.addActionListener(new ActionListener()
-				{
-					
-					@Override
-					public void actionPerformed(ActionEvent arg0)
-					{
-						try
-						{
-							new OutputData();
-						}
-						catch (FileNotFoundException e)
-						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						catch (ClassNotFoundException e)
-						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						catch (ParserConfigurationException e)
-						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						catch (TransformerException e)
-						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						catch (SQLException e)
-						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				});
-
-				// Добавление новой станции
-				addRecords.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						try
-						{
-							PreparedStatement pst = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).prepareStatement("INSERT INTO station VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
-
-							pst.setInt(2, 0);
-
-							pst.setInt(3, 0);
-
-							pst.setInt(4, 5);
-
-							pst.setString(5, "false");
-
-							pst.setString(6, "Новая");
-							pst.setString(7, "Новая");
-							pst.setString(8, "Новая");
-
-							pst.addBatch();
-							pst.executeBatch();
-							pst.close();
-
-							refreshTable();
-						}
-						catch (SQLException e1)
-						{
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
-				});
-
-				if (0 < jDataTable.getSelectedRows().length && Me.isMetaDown())
-				{
-
-					// Удаление станции
-					JMenuItem deletRecords = new JMenuItem("Удалить:" + jDataTable.getSelectedRows().length);
-					Pmenu.add(deletRecords);
-
-					// Активация станции
-					JMenuItem activeRecords = new JMenuItem("Активировать:" + jDataTable.getSelectedRows().length);
-					Pmenu.add(activeRecords);
-
-					// Деактивация станции
-					JMenuItem deactiveRecords = new JMenuItem("Деактивировать:" + jDataTable.getSelectedRows().length);
-					Pmenu.add(deactiveRecords);
-
-					// показываем PopUp меню
-					Pmenu.show(Me.getComponent(), Me.getX(), Me.getY());
-
-					// Удаление станции
-					deletRecords.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
-						{
-							String[] choices = { "Да", "Нет" };
-
-							// создание сообщения
-							int response = JOptionPane.showOptionDialog(null // В
-																				// центре
-																				// окна
-							, "Вы уверены, что хотите удалить?" // Сообщение
-							, "" // Титульник сообщения
-							, JOptionPane.YES_NO_OPTION // Option type
-							, JOptionPane.PLAIN_MESSAGE // messageType
-							, null // Icon (none)
-							, choices // Button text as above.
-							, "" // Default button's labelF
-							);
-
-							// обработка ответа пользователя
-							switch (response)
-							{
-								case 0:
-									try
-									{
-										// удаление
-										for (int i = 0; i < jDataTable.getSelectedRows().length; i++)
-										{
-											String id = jDataTable.getValueAt(jDataTable.getSelectedRows()[i], 0).toString();
-
-											delStation(id);
-										}
-										refreshTable();
-									}
-									catch (SQLException e1)
-									{
-										e1.printStackTrace();
-									}
-									break;
-								case 1:
-									// ничего не удаляем
-									break;
-								case -1:
-									// окно было закрыто - ничего не удаляем
-								default:
-									break;
-							}
-
-						}
-					});
-
-					// Активация станции
-					activeRecords.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
-						{
-							try
-							{
-								for (int i = 0; i < jDataTable.getSelectedRows().length; i++)
-								{
-									String id = jDataTable.getValueAt(jDataTable.getSelectedRows()[i], 0).toString();
-
-									DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE station SET active = 'true' WHERE id LIKE '" + id + "';");
-								}
-								refreshTable();
-							}
-							catch (SQLException e1)
-							{
-								e1.printStackTrace();
-							}
-						}
-					});
-
-					// Деактивация станции
-					deactiveRecords.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
-						{
-							try
-							{
-								for (int i = 0; i < jDataTable.getSelectedRows().length; i++)
-								{
-									String id = jDataTable.getValueAt(jDataTable.getSelectedRows()[i], 0).toString();
-
-									DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE station SET active = 'false' WHERE id LIKE '" + id + "';");
-								}
-								refreshTable();
-							}
-							catch (SQLException e1)
-							{
-								e1.printStackTrace();
-							}
-						}
-					});
-				}
-
-				if (Me.isMetaDown())
-					Pmenu.show(Me.getComponent(), Me.getX(), Me.getY());
-			}
-		});
-
-		tablePanel.add(new JScrollPane(jDataTable), null);
-		refreshTable();
-
-		this.repaint();
+			if (Me.isMetaDown())
+				Pmenu.show(Me.getComponent(), Me.getX(), Me.getY());
+		}
 	}
 
 	/**
-	 * Обновление данных в таблице, учитывая район и сетевого поставщика<br>
+	 * Вывод данных в xml
+	 * 
+	 * @throws SQLException
+	 * @throws FileNotFoundException
+	 * @throws ClassNotFoundException
+	 * @throws ParserConfigurationException
+	 * @throws TransformerException
+	 */
+	private void outputDat() throws SQLException, FileNotFoundException, ClassNotFoundException, ParserConfigurationException, TransformerException
+	{
+		/*
+		 * Получение текста справочной информации
+		 */
+		ResultSet rs = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeQuery("SELECT text FROM main WHERE id LIKE '1';");
+
+		String text = "";
+		if (rs.next())
+		{
+			text = rs.getString("text");
+		}
+		rs.close();
+		
+		/*
+		 * Изменение справочной информации пользователем
+		 * и вывод данных
+		 */
+
+		String str = (String) JOptionPane.showInputDialog(null, "Введите справочную информацию: ", "Нефтепродукты", 1, null, null, text);
+
+		if (str != null)
+		{
+			DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE main SET text = '" + str + "' WHERE id LIKE '1';");
+
+			new OutputData();
+		}
+	}
+
+	/**
+	 * Обновление данных, учитывая район и сетевого поставщика<br>
 	 * Вывод:<br>
-	 * - id<br>
 	 * - Дата<br>
 	 * - Состояние<br>
 	 * - Наименование<br>
-	 * - топливо<br>
+	 * - Топливо<br>
 	 * 
 	 * @throws SQLException
 	 */
-	private void refreshTable() throws SQLException
+	public void refreshDataPanel() throws SQLException
 	{
-		Vector<String> header = new Vector<String>();
+		/*
+		 * Удаляет компоненты с инф о АЗС
+		 */
+		if (this.getComponentCount() > 1)
+			this.remove(1);
+
+		/*
+		 * переопределяем панель с АЗС
+		 */
+		table = new JPanel();
+		table.setLayout(new BoxLayout(table, BoxLayout.PAGE_AXIS));
+
+		/*
+		 * Данные для фильтрации АЗС
+		 */
+		String district_id = ((ComboItem) cbDistrict.getItemAt(cbDistrict.getSelectedIndex())).getValue();
+		String comm_id = ((ComboItem) cbComm.getItemAt(cbComm.getSelectedIndex())).getValue();
+
+		/*
+		 * Вывод данных АЗС
+		 */
+		ResultSet rs = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeQuery("SELECT id,title,active,address FROM station WHERE district_id LIKE '" + district_id + "' AND comm_id LIKE '" + comm_id + "';");
+
+		while (rs.next())
 		{
-			header.add("id");
-			header.add("Дата");
-			header.add("Состояние");
-			header.add("Наименование");
-			header.add("80");
-			header.add("92");
-			header.add("95");
-			header.add("dis");
-		}
+			/*
+			 * поиск последнего изменения
+			 */
+			ResultSet time = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeQuery("SELECT changedate,b80,b92,b95,bdis,id FROM change WHERE station_id LIKE '" + rs.getString(1) + "';");
 
-		Vector<Vector<String>> values = new Vector<Vector<String>>();
-		{
-			String district_id = ((ComboItem) cbDistrict.getItemAt(cbDistrict.getSelectedIndex())).getValue();
-			String comm_id = ((ComboItem) cbComm.getItemAt(cbComm.getSelectedIndex())).getValue();
+			Long max_time = (long) 0;
+			String b80 = "";
+			String b92 = "";
+			String b95 = "";
+			String bdis = "";
+			// String changeid = "";
 
-			ResultSet rs = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeQuery("SELECT id,title,active FROM station WHERE district_id LIKE '" + district_id + "' AND comm_id LIKE '" + comm_id + "';");
-
-			while (rs.next())
+			while (time.next())
 			{
-				// поиск последнего изменения
-				ResultSet time = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeQuery("SELECT changedate,b80,b92,b95,bdis FROM change WHERE station_id LIKE '" + rs.getString(1) + "';");
+				Long temp = Long.parseLong(time.getString("changedate"));
 
-				Long max_time = (long) 0;
-				String b80 = "";
-				String b92 = "";
-				String b95 = "";
-				String bdis = "";
-
-				while (time.next())
+				if (temp > max_time)
 				{
-					Long temp = Long.parseLong(time.getString(1));
-
-					if (temp > max_time)
-					{
-						max_time = temp;
-						b80 = time.getString(2);
-						b92 = time.getString(3);
-						b95 = time.getString(4);
-						bdis = time.getString(5);
-					}
+					max_time = temp;
+					b80 = time.getString("b80");
+					b92 = time.getString("b92");
+					b95 = time.getString("b95");
+					bdis = time.getString("bdis");
+					// changeid = time.getString("id");
 				}
-				time.close();
-
-				DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-				Date date = new Date(max_time);
-
-				Vector<String> item = new Vector<String>();
-
-				// id
-				item.add(rs.getString(1));
-				// дата последнего изменения
-				item.add(dateFormat.format(date).toString());
-				// Состояние
-				item.add(rs.getString(3));
-				// Наименование
-				item.add(rs.getString(2));
-				// Топливо
-				item.add(b80);
-				item.add(b92);
-				item.add(b95);
-				item.add(bdis);
-
-				values.add(item);
 			}
+			time.close();
 
-			rs.close();
+			DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+			Date date = new Date(max_time);
+
+			ListItem item = new ListItem();
+
+			// id
+			item.setStationId(rs.getString("id"));
+			// id последнего изменения
+			// item.setChangeId(changeid);
+			// дата последнего изменения
+			item.setDate((dateFormat.format(date).toString()));
+			// Состояние
+			item.setStatus(rs.getString("active"));
+			// Наименование
+			item.setTitle(rs.getString("title"));
+			// Адрес месторасположения
+			item.setAddress(rs.getString("address"));
+			// Топливо
+			item.setB80(b80);
+			item.setB92(b92);
+			item.setB95(b95);
+			item.setBdis(bdis);
+
+			// PopUP
+			item.addMouseListener(new PopUpTable());
+
+			// создание карточки
+			item.initialization();
+			table.add(item);
 		}
+		rs.close();
 
-		// Помещаю в модель таблицы данные
-		DefaultTableModel dtm = (DefaultTableModel) jDataTable.getModel();
-		// Сначала данные, потом шапка
-		dtm.setDataVector(values, header);
-		// задаем ширину каждого столбца, кроме наименования
-		// id
-		jDataTable.getColumnModel().getColumn(0).setMaxWidth(40);
-		// дата
-		jDataTable.getColumnModel().getColumn(1).setMaxWidth(90);
-		// состояние
-		jDataTable.getColumnModel().getColumn(2).setMaxWidth(40);
-		// топливо
-		jDataTable.getColumnModel().getColumn(4).setMaxWidth(40);
-		jDataTable.getColumnModel().getColumn(5).setMaxWidth(40);
-		jDataTable.getColumnModel().getColumn(6).setMaxWidth(40);
-		jDataTable.getColumnModel().getColumn(7).setMaxWidth(40);
+		/*
+		 * Скроллбар из-за количества записей, не влезавших в видимую область
+		 * + увеличина прокрутка колесом мыши
+		 */
+		JScrollPane pane = new JScrollPane(table);
+		JScrollBar jsp = pane.getVerticalScrollBar();
+		jsp.setUnitIncrement(20);
 
+		this.add(pane, BorderLayout.CENTER);
+		
+		this.repaint();
 		this.validate();
 	}
 
 	/**
-	 * Панель с информации о АЗС
+	 * Вывод панели с информации о АЗС
 	 * 
 	 * @param station_id
 	 *            - id АЗС
@@ -679,11 +448,12 @@ public class Stations extends JPanel
 	 *            - id удаляемого поставщика
 	 * @throws SQLException
 	 */
+	@SuppressWarnings("unused")
 	private void delStation(String station_id) throws SQLException
 	{
 		DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("DELETE FROM change WHERE station_id = '" + station_id + "';");
 		DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("DELETE FROM station WHERE id = '" + station_id + "';");
 
-		refreshTable();
+		refreshDataPanel();
 	}
 }

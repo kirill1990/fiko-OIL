@@ -392,6 +392,7 @@ public class Station extends JPanel
 					pst.addBatch();
 
 					pst.executeBatch();
+					pst.close();
 
 					refreshCostOil();
 				}
