@@ -121,8 +121,8 @@ public class ListItem extends JPanel
 					// удалить
 					DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("DELETE FROM change WHERE id = '" + changeId + "';");
 					
-
 					label_date.setText(date);
+					label_date.setForeground(new Color(76,76,76));
 					
 				}
 				else
@@ -144,7 +144,6 @@ public class ListItem extends JPanel
 						DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET b95 = '" + label_b95.getText() + "' WHERE id LIKE '" + changeId + "';");
 
 						DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("UPDATE change SET bdis = '" + label_bdis.getText() + "' WHERE id LIKE '" + changeId + "';");
-
 					}
 					else
 					{
@@ -173,6 +172,7 @@ public class ListItem extends JPanel
 						rs.close();
 
 						label_date.setText(current_date);
+						label_date.setForeground(Color.red);
 					}
 				}
 			}

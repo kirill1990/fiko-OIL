@@ -129,6 +129,9 @@ public class Oil extends JFrame
 		
 		new Oil();
 		
+		
+		
+		
 //		new OutputData();
 		
 

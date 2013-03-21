@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
@@ -25,6 +26,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ru.fiko.oil.main.Oil;
+import ru.fiko.oil.supp.TestSer;
+import ru.fiko.oil.supp.TestSer.FileParam;
+import ru.fiko.oil.supp.TestSer.Param;
 
 /**
  * @author kirill
@@ -43,9 +47,31 @@ public class OutputData
 		pathFolder = "карта/xml";
 		new File(pathFolder).mkdirs();
 		pathFolder += "/";
+		
+		
 		regions();
 		providers();
 		_main();
+		
+//		String url = "http://fondim.kaluga.net/map_oil/upload.php";
+		String url = "http://localhost/map_oil/upload.php";
+		String[] filename = new String[3];
+		filename[0] = "main.xml";
+		filename[1] = "providers.xml";
+		filename[2] = "regions.xml";
+		
+		for(int i=0;i<filename.length;i++)
+		{
+			ArrayList<TestSer.Param> params = new ArrayList<TestSer.Param>();
+			params.add(new Param("pass","876954361"));
+			
+			ArrayList<TestSer.FileParam> fileParams = new ArrayList<TestSer.FileParam>();
+			fileParams.add(new FileParam("filename", filename[i], new File(pathFolder+filename[i]), ""));
+			
+			TestSer aa = new TestSer(url, params, fileParams);
+			aa.send();
+		}
+		
 		JOptionPane.showMessageDialog(null, "Готово");
 //		// Создание диалога выбора файла
 //		JFileChooser fileChooser = new JFileChooser();
