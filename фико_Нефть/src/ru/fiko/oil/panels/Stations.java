@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.FileNotFoundException;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -51,6 +52,8 @@ public class Stations extends JPanel
 	// Индексы последних изменений, выпадающих списков
 	private int					indexDistrict		= 0;
 	private int					indexComm			= 0;
+	
+	public ListItem current = null;
 
 	public Stations() throws SQLException, ClassNotFoundException
 	{
@@ -385,6 +388,8 @@ public class Stations extends JPanel
 			Date date = new Date(max_time);
 
 			ListItem item = new ListItem();
+			
+			item.setThis(this);
 
 			// id
 			item.setStationId(rs.getString("id"));
@@ -420,7 +425,7 @@ public class Stations extends JPanel
 		JScrollPane pane = new JScrollPane(table);
 		JScrollBar jsp = pane.getVerticalScrollBar();
 		jsp.setUnitIncrement(20);
-
+		
 		this.add(pane, BorderLayout.CENTER);
 		
 		this.repaint();

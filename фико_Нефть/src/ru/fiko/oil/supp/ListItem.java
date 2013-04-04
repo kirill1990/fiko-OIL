@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,6 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import ru.fiko.oil.main.Oil;
+import ru.fiko.oil.panels.Stations;
 
 public class ListItem extends JPanel
 {
@@ -49,11 +52,17 @@ public class ListItem extends JPanel
 
 	private JTextField			label_bdis;
 
+	private ListItem	aaa;
+
+	private Stations	stations;
+
 	public void initialization()
 	{
 		this.setLayout(new BorderLayout(5, 5));
 		this.setBorder(BorderFactory.createTitledBorder(null, title, TitledBorder.CENTER, TitledBorder.TOP, getFont(), Color.BLACK));
-
+		//this.setBackground(Color.BLACK);
+		
+		
 		JPanel panel = new JPanel(new BorderLayout());
 		this.add(panel, BorderLayout.WEST);
 
@@ -66,6 +75,7 @@ public class ListItem extends JPanel
 
 		JTextField address = new JTextField(this.address);
 		address.setEditable(false);
+		address.addMouseListener(new ads());
 		this.add(address, BorderLayout.CENTER);
 
 		JPanel toplivo = new JPanel(new GridLayout(2, 4));
@@ -93,16 +103,46 @@ public class ListItem extends JPanel
 		label_b92.addKeyListener(new mmm());
 		label_b95.addKeyListener(new mmm());
 		label_bdis.addKeyListener(new mmm());
+		
+		label_b80.addMouseListener(new ads());
+		label_b92.addMouseListener(new ads());
+		label_b95.addMouseListener(new ads());
+		label_bdis.addMouseListener(new ads());
 
 		toplivo.add(label_b80);
 		toplivo.add(label_b92);
 		toplivo.add(label_b95);
 		toplivo.add(label_bdis);
+		
+		
+		aaa = this;
+		this.addMouseListener(new ads());
 
+	}
+	
+	private class ads extends MouseAdapter
+	{
+		//TODO refactor
+		@Override
+		public void mouseClicked(MouseEvent e)
+		{
+			if(stations.current!=null)
+				stations.current.setColor(new Color(242,241,240));
+			
+			stations.current = aaa;
+			setColor(new Color(115,171,255));
+		}
+	}
+	
+	private void setColor(Color color)
+	{
+		//TODO comments
+		this.setBackground(color);
 	}
 
 	private class mmm extends KeyAdapter
 	{
+		//TODO refactor
 		public void keyReleased(KeyEvent e)
 		{
 			JTextField target = ((JTextField) e.getComponent());
@@ -178,7 +218,6 @@ public class ListItem extends JPanel
 			}
 			catch (SQLException e1)
 			{
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
@@ -282,5 +321,10 @@ public class ListItem extends JPanel
 	public void setChangeId(String changeId)
 	{
 		this.changeId = changeId;
+	}
+
+	public void setThis(Stations stations)
+	{
+		this.stations = stations;
 	}
 }
