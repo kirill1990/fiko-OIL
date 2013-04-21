@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -28,6 +29,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import ru.fiko.oil.data.OutputData;
 import ru.fiko.oil.main.Oil;
@@ -289,8 +291,10 @@ public class Stations extends JPanel
 	 * @throws ClassNotFoundException
 	 * @throws ParserConfigurationException
 	 * @throws TransformerException
+	 * @throws ParseException 
+	 * @throws TransformerFactoryConfigurationError 
 	 */
-	private void outputDat() throws SQLException, FileNotFoundException, ClassNotFoundException, ParserConfigurationException, TransformerException
+	private void outputDat() throws SQLException, FileNotFoundException, ClassNotFoundException, ParserConfigurationException, TransformerException, TransformerFactoryConfigurationError, ParseException
 	{
 		/*
 		 * Получение текста справочной информации
@@ -366,7 +370,7 @@ public class Stations extends JPanel
 			String b92 = "";
 			String b95 = "";
 			String bdis = "";
-			// String changeid = "";
+			String changeid = "";
 
 			while (time.next())
 			{
@@ -379,7 +383,7 @@ public class Stations extends JPanel
 					b92 = time.getString("b92");
 					b95 = time.getString("b95");
 					bdis = time.getString("bdis");
-					// changeid = time.getString("id");
+					changeid = time.getString("id");
 				}
 			}
 			time.close();
@@ -408,6 +412,7 @@ public class Stations extends JPanel
 			item.setB92(b92);
 			item.setB95(b95);
 			item.setBdis(bdis);
+			item.setChangeId(changeid);
 
 			// PopUP
 			item.addMouseListener(new PopUpTable());

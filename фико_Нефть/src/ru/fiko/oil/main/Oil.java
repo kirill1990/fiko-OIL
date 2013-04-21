@@ -8,6 +8,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Formatter;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -131,6 +135,24 @@ public class Oil extends JFrame {
 
 	// new OutputData();
 
+//	try {
+//	    
+//	    SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+//	
+//	    Date test = formatter.parse(formatter.format(new Date(System.currentTimeMillis())));
+//	    
+//	    Date plusone = new Date(test.getTime()+86400000);
+//	    
+//	    Date date1 = formatter.parse("19.04.2013");
+//	    Date date2 = formatter.parse("26.04.2013");
+//	    //86400000
+//	    //604800000
+//	    
+//	    System.out.println(date1.getTime()-date2.getTime());
+//	} catch (ParseException e) {
+//	    e.printStackTrace();
+//	}
+	
 	// try
 	// {
 	// SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");

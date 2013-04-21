@@ -152,7 +152,7 @@ public class ListItem extends JPanel
 				target.setText(target.getText().substring(0, 5));
 			}
 			label_date.getText();
-
+			
 			try
 			{
 
@@ -162,8 +162,7 @@ public class ListItem extends JPanel
 					DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH).createStatement().executeUpdate("DELETE FROM change WHERE id = '" + changeId + "';");
 					
 					label_date.setText(date);
-					label_date.setForeground(new Color(76,76,76));
-					
+					label_date.setForeground(new Color(76,76,76));					
 				}
 				else
 				{
@@ -210,10 +209,9 @@ public class ListItem extends JPanel
 							changeId = rs.getString(1);
 						}
 						rs.close();
-
-						label_date.setText(current_date);
-						label_date.setForeground(Color.red);
 					}
+					label_date.setText(current_date);
+					label_date.setForeground(Color.red);
 				}
 			}
 			catch (SQLException e1)
