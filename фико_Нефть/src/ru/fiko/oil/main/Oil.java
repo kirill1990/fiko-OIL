@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.Locale;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -28,6 +29,7 @@ import ru.fiko.oil.data.OutputSvod;
 import ru.fiko.oil.panels.Citys;
 import ru.fiko.oil.panels.Districts;
 import ru.fiko.oil.panels.Main;
+import ru.fiko.oil.panels.Optov;
 import ru.fiko.oil.panels.Stations;
 
 /**
@@ -42,8 +44,8 @@ public class Oil extends JFrame {
 
     public static final String PATH = "oil.db";
 
-    private static int WIDTH = 830;
-    private static int HEIGHT = 550;
+    private static int WIDTH = 1100;
+    private static int HEIGHT = 450;
 
     private static Connection conn = null;
     private static Statement stat = null;
@@ -60,12 +62,13 @@ public class Oil extends JFrame {
 	 * Инициализация параметров окна
 	 */
 	this.setSize(WIDTH, HEIGHT);
+	
 	// всегда по центру экрана
 	this.setLocation(
 		(Toolkit.getDefaultToolkit().getScreenSize().width - WIDTH) / 2,
 		(Toolkit.getDefaultToolkit().getScreenSize().height - HEIGHT) / 2);
 	this.setTitle("Нефтепродукты");
-	this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//	this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	this.setVisible(true);
 
 	/*
@@ -87,6 +90,7 @@ public class Oil extends JFrame {
 	// jtp.setTabPlacement(JTabbedPane.LEFT);
 
 	jtp.add("Поставщики", new Stations());
+	jtp.add("Оптовые", new Optov());
 	jtp.add("Базовые настройки", new Main());
 	jtp.add("Главы районов", new Districts());
 	jtp.add("Города", new Citys());
@@ -105,14 +109,14 @@ public class Oil extends JFrame {
      * @throws InstantiationException
      * @throws TransformerException
      * @throws ParserConfigurationException
-     * @throws IOException 
-     * @throws WriteException 
+     * @throws IOException
+     * @throws WriteException
      */
     public static void main(String[] args) throws SQLException,
 	    ClassNotFoundException, InstantiationException,
 	    IllegalAccessException, UnsupportedLookAndFeelException,
-	    ParserConfigurationException,
-	    TransformerException, IOException, WriteException {
+	    ParserConfigurationException, TransformerException, IOException,
+	    WriteException {
 	Class.forName("org.sqlite.JDBC");
 	conn = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH);
 	stat = conn.createStatement();
@@ -189,30 +193,31 @@ public class Oil extends JFrame {
 	conn.close();
 	// ConnectionToBD bd = new ConnectionToBD();
 
-	//new Oil();
+//	new Oil();
 
-	new OutputSvod();
-	
+	 new OutputSvod();
+
 	// new OutputData();
 
-	// try {
-	//
-	// SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-	//
-	// Date test = formatter.parse(formatter.format(new
-	// Date(System.currentTimeMillis())));
-	//
-	// Date plusone = new Date(test.getTime()+86400000);
-	//
-	// Date date1 = formatter.parse("19.04.2013");
-	// Date date2 = formatter.parse("26.04.2013");
-	// //86400000
-	// //604800000
-	//
-	// System.out.println(date1.getTime()-date2.getTime());
-	// } catch (ParseException e) {
-	// e.printStackTrace();
-	// }
+//	 try {
+//	
+//	 SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+//	 SimpleDateFormat formatter2 = new SimpleDateFormat("E", Locale.ENGLISH);
+//	
+//	 Date test = formatter.parse(formatter.format(new
+//	 Date(System.currentTimeMillis())));
+//	
+//	 Date plusone = new Date(test.getTime()+86400000);
+//	
+//	 Date date1 = formatter.parse("26.04.2013");
+//	 Date date2 = formatter.parse("20.04.2013");
+//	 //86400000
+//	 //604800000
+//	
+//	 System.out.println(date1.getTime());
+//	 } catch (ParseException e) {
+//	 e.printStackTrace();
+//	 }
 
 	// try
 	// {

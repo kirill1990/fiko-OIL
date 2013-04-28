@@ -1,14 +1,10 @@
 package ru.fiko.oil.supp;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Panel;
 import java.util.EventObject;
 
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.ListCellRenderer;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
