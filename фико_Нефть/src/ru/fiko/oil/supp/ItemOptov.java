@@ -414,7 +414,7 @@ public class ItemOptov extends JPanel {
 			pst.setString(3,
 				Long.toString(System.currentTimeMillis()));
 //			pst.setString(3,
-//				Long.toString(1367145498916l - 86400000*3));
+//				Long.toString(1367145498916l - 86400000*2));
 
 			pst.setString(4, label_b80_t.getText());
 			pst.setString(5, label_b92_t.getText());

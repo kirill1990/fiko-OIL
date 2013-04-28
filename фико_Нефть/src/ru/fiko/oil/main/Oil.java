@@ -111,12 +111,13 @@ public class Oil extends JFrame {
      * @throws ParserConfigurationException
      * @throws IOException
      * @throws WriteException
+     * @throws ParseException 
      */
     public static void main(String[] args) throws SQLException,
 	    ClassNotFoundException, InstantiationException,
 	    IllegalAccessException, UnsupportedLookAndFeelException,
 	    ParserConfigurationException, TransformerException, IOException,
-	    WriteException {
+	    WriteException, ParseException {
 	Class.forName("org.sqlite.JDBC");
 	conn = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH);
 	stat = conn.createStatement();
