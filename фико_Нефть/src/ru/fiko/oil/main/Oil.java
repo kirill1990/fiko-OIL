@@ -4,6 +4,7 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -20,7 +21,10 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import jxl.write.WriteException;
+
 import ru.fiko.oil.data.ConnectionToBD;
+import ru.fiko.oil.data.OutputSvod;
 import ru.fiko.oil.panels.Citys;
 import ru.fiko.oil.panels.Districts;
 import ru.fiko.oil.panels.Main;
@@ -101,58 +105,115 @@ public class Oil extends JFrame {
      * @throws InstantiationException
      * @throws TransformerException
      * @throws ParserConfigurationException
-     * @throws FileNotFoundException
+     * @throws IOException 
+     * @throws WriteException 
      */
     public static void main(String[] args) throws SQLException,
 	    ClassNotFoundException, InstantiationException,
 	    IllegalAccessException, UnsupportedLookAndFeelException,
-	    FileNotFoundException, ParserConfigurationException,
-	    TransformerException {
+	    ParserConfigurationException,
+	    TransformerException, IOException, WriteException {
 	Class.forName("org.sqlite.JDBC");
 	conn = DriverManager.getConnection("jdbc:sqlite:" + Oil.PATH);
 	stat = conn.createStatement();
 
 	/*
-	 * проверка наличие бд. если нет, то создаёт новую
+	 * проверка наличие бд. если нет, то создаёт новые
 	 */
-	stat.executeUpdate("CREATE TABLE IF NOT EXISTS district(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, title STRING, glava_fio STRING, glava_tel STRING, zam_fio STRING, zam_tel STRING);");
+	stat.executeUpdate("CREATE TABLE IF NOT EXISTS district(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+		+ "title STRING, "
+		+ "glava_fio STRING, "
+		+ "glava_tel STRING, "
+		+ "zam_fio STRING, "
+		+ "zam_tel STRING);");
 
-	stat.executeUpdate("CREATE TABLE IF NOT EXISTS commercial(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, title STRING);");
+	stat.executeUpdate("CREATE TABLE IF NOT EXISTS commercial(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+		+ "title STRING);");
 
-	stat.executeUpdate("CREATE TABLE IF NOT EXISTS city(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, title STRING, x STRING, y STRING);");
+	stat.executeUpdate("CREATE TABLE IF NOT EXISTS city(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+		+ "district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, "
+		+ "title STRING, " + "x STRING, " + "y STRING);");
 
-	stat.executeUpdate("CREATE TABLE IF NOT EXISTS client(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, city_id INTEGER REFERENCES city(id) ON UPDATE CASCADE ON DELETE CASCADE, title STRING, address STRING);");
+	stat.executeUpdate("CREATE TABLE IF NOT EXISTS client(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+		+ "district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, "
+		+ "city_id INTEGER REFERENCES city(id) ON UPDATE CASCADE ON DELETE CASCADE, "
+		+ "title STRING, " + "address STRING);");
 
-	stat.executeUpdate("CREATE TABLE IF NOT EXISTS station(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, city_id INTEGER REFERENCES city(id) ON UPDATE CASCADE ON DELETE CASCADE, comm_id INTEGER REFERENCES commercial(id) ON UPDATE CASCADE , active STRING, title STRING, address STRING, tel STRING);");
+	stat.executeUpdate("CREATE TABLE IF NOT EXISTS station(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+		+ "district_id INTEGER REFERENCES district(id) ON UPDATE CASCADE ON DELETE CASCADE, "
+		+ "city_id INTEGER REFERENCES city(id) ON UPDATE CASCADE ON DELETE CASCADE, "
+		+ "comm_id INTEGER REFERENCES commercial(id) ON UPDATE CASCADE , "
+		+ "active STRING, "
+		+ "title STRING, "
+		+ "address STRING, "
+		+ "tel STRING);");
 
-	stat.executeUpdate("CREATE TABLE IF NOT EXISTS change(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, station_id INTEGER REFERENCES station(id) ON UPDATE CASCADE ON DELETE CASCADE, changedate STRING, b80 STRING, b92 STRING, b95 STRING, bdis STRING);");
+	stat.executeUpdate("CREATE TABLE IF NOT EXISTS change(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+		+ "station_id INTEGER REFERENCES station(id) ON UPDATE CASCADE ON DELETE CASCADE, "
+		+ "changedate STRING, "
+		+ "b80 STRING, "
+		+ "b92 STRING, "
+		+ "b95 STRING, " + "bdis STRING);");
 
-	stat.executeUpdate("CREATE TABLE IF NOT EXISTS main(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, texturl STRING, url STRING, text STRING, bname STRING, baddress STRING, b80 STRING, b92 STRING, b95 STRING, bdis STRING, binfo STRING, orgname STRING, orgaddress STRING);");
+	stat.executeUpdate("CREATE TABLE IF NOT EXISTS main(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+		+ "texturl STRING, "
+		+ "url STRING, "
+		+ "text STRING, "
+		+ "bname STRING, "
+		+ "baddress STRING, "
+		+ "b80 STRING, "
+		+ "b92 STRING, "
+		+ "b95 STRING, "
+		+ "bdis STRING, "
+		+ "binfo STRING, " + "orgname STRING, " + "orgaddress STRING);");
 
+	stat.executeUpdate("CREATE TABLE IF NOT EXISTS optov(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+		+ "comm_id INTEGER REFERENCES commercial(id) ON UPDATE CASCADE ON DELETE CASCADE, "
+		+ "changedate STRING,"
+		+ "b80_t STRING,"
+		+ "b92_t STRING,"
+		+ "b95_t STRING,"
+		+ "bdis_mc_t STRING,"
+		+ "bdis_winter_t STRING,"
+		+ "bdis_leto1_t STRING,"
+		+ "bdis_leto2_t STRING,"
+		+ "b80_l STRING,"
+		+ "b92_l STRING,"
+		+ "b95_l STRING,"
+		+ "bdis_mc_l STRING,"
+		+ "bdis_winter_l STRING,"
+		+ "bdis_leto1_l STRING,"
+		+ "bdis_leto2_l STRING);");
+
+	stat.close();
+	conn.close();
 	// ConnectionToBD bd = new ConnectionToBD();
 
-	new Oil();
+	//new Oil();
 
+	new OutputSvod();
+	
 	// new OutputData();
 
-//	try {
-//	    
-//	    SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-//	
-//	    Date test = formatter.parse(formatter.format(new Date(System.currentTimeMillis())));
-//	    
-//	    Date plusone = new Date(test.getTime()+86400000);
-//	    
-//	    Date date1 = formatter.parse("19.04.2013");
-//	    Date date2 = formatter.parse("26.04.2013");
-//	    //86400000
-//	    //604800000
-//	    
-//	    System.out.println(date1.getTime()-date2.getTime());
-//	} catch (ParseException e) {
-//	    e.printStackTrace();
-//	}
-	
+	// try {
+	//
+	// SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+	//
+	// Date test = formatter.parse(formatter.format(new
+	// Date(System.currentTimeMillis())));
+	//
+	// Date plusone = new Date(test.getTime()+86400000);
+	//
+	// Date date1 = formatter.parse("19.04.2013");
+	// Date date2 = formatter.parse("26.04.2013");
+	// //86400000
+	// //604800000
+	//
+	// System.out.println(date1.getTime()-date2.getTime());
+	// } catch (ParseException e) {
+	// e.printStackTrace();
+	// }
+
 	// try
 	// {
 	// SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
@@ -178,5 +239,4 @@ public class Oil extends JFrame {
 	// System.out.println(dateFormat.format(date));
 
     }
-
 }

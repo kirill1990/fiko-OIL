@@ -34,7 +34,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import ru.fiko.oil.data.OutputData;
 import ru.fiko.oil.main.Oil;
 import ru.fiko.oil.supp.ComboItem;
-import ru.fiko.oil.supp.ListItem;
+import ru.fiko.oil.supp.ItemStation;
 
 /**
  * Панель с данными по "Поставщикам"
@@ -55,7 +55,7 @@ public class Stations extends JPanel
 	private int					indexDistrict		= 0;
 	private int					indexComm			= 0;
 	
-	public ListItem current = null;
+	public ItemStation current = null;
 
 	public Stations() throws SQLException, ClassNotFoundException
 	{
@@ -196,7 +196,7 @@ public class Stations extends JPanel
 		{
 			JPopupMenu Pmenu = new JPopupMenu();
 
-			final String station_id = ((ListItem) Me.getComponent()).getStationId();
+			final String station_id = ((ItemStation) Me.getComponent()).getStationId();
 
 			// Вывод инфморации
 			JMenuItem output = new JMenuItem("Вывод в xml");
@@ -391,7 +391,7 @@ public class Stations extends JPanel
 			DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 			Date date = new Date(max_time);
 
-			ListItem item = new ListItem();
+			ItemStation item = new ItemStation();
 			
 			item.setThis(this);
 

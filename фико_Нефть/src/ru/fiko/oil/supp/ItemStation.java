@@ -24,7 +24,7 @@ import javax.swing.border.TitledBorder;
 import ru.fiko.oil.main.Oil;
 import ru.fiko.oil.panels.Stations;
 
-public class ListItem extends JPanel
+public class ItemStation extends JPanel
 {
 	/**
 	 * 
@@ -52,7 +52,7 @@ public class ListItem extends JPanel
 
 	private JTextField			label_bdis;
 
-	private ListItem	aaa;
+	private ItemStation	aaa;
 
 	private Stations	stations;
 

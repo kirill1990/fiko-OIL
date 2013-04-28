@@ -88,7 +88,7 @@ public class OutputData {
 	filename[1] = "providers.xml";
 	filename[2] = "regions.xml";
 	filename[3] = "clients.xml";
-	filename[4] = "clients.xml";
+	filename[4] = "grafics.xml";
 
 	for (int i = 0; i < filename.length; i++) {
 	    ArrayList<TestSer.Param> params = new ArrayList<TestSer.Param>();
