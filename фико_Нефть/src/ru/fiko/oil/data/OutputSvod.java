@@ -38,6 +38,8 @@ public class OutputSvod {
 
     JXLConstant font = new JXLConstant();
 
+    Vector<Integer> ave_k = new Vector<Integer>();
+
     private WritableWorkbook workbook;
     private WritableSheet sheet;
 
@@ -113,17 +115,69 @@ public class OutputSvod {
 	sheet.mergeCells(0, 0, 22, 0);
 	sheet.setRowView(0, 700);
 
-	cape(1, 4, sheet);
+	int column = 1;
+	int row = 4;
 
-	pro1(3, 4, sheet);
+	column = cape(column, row, sheet);
+
+	column = pro1(column, row, sheet);
+	column = pro2(column, row, sheet);
+	column = pro3(column, row, sheet);
+
+	column = cape(column, row, sheet);
+
+	column = pro4(column, row, sheet);
+	column = pro5(column, row, sheet);
+	column = pro6(column, row, sheet);
+	column = pro7(column, row, sheet);
+	column = pro8(column, row, sheet);
+	column = pro9(column, row, sheet);
+	column = pro10(column, row, sheet);
+	column = pro11(column, row, sheet);
+	column = pro12(column, row, sheet);
+	column = pro13(column, row, sheet);
+	column = pro14(column, row, sheet);
+	column = pro15(column, row, sheet);
+
+	String ave_count = "";
+	String ave_sum = "";
+	String rows = "58";
+
+	for (int index : ave_k) {
+	    System.out.println(toColumnExcel(index));
+	    if (ave_count.length() > 0) {
+		ave_count += "," + "IF("+toColumnExcel(index) + rows+">0,"+toColumnExcel(index) + rows+",\"a\")";
+		ave_sum += "," + "IF(ISNUMBER(" + toColumnExcel(index) + rows
+			+ ")," + toColumnExcel(index) + rows + ",0)";
+	    } else {
+		ave_count += "IF("+toColumnExcel(index) + rows+">0,"+toColumnExcel(index) + rows+",\"a\")";
+		ave_sum += "IF(ISNUMBER(" + toColumnExcel(index) + rows + "),"
+			+ toColumnExcel(index) + rows + ",0)";
+	    }
+	}
+//=СУММ(ЕСЛИ(ЕЧИСЛО(AF58);AF58;0);ЕСЛИ(ЕЧИСЛО(AD58);AD58;0))
+	System.out.println(ave_count);
+	System.out.println(ave_sum);
+	// sheet.addCell(new Formula(0, 2, "IF(ISERROR(AVERAGE(" + ave +
+	// ")),\"-\",AVERAGE(" + ave + "))"));
+	// sheet.addCell(new Formula(0, 2, "AVERAGE(" + ave + ")"));
+	// sheet.addCell(new Formula(0, 2,
+	// "AVERAGE(AF58,IF(ISNUMBER(AD58),AD58,\"asg\"))"));
+	// sheet.addCell(new Formula(0, 2,
+	// "AVERAGE(IF("+ave+" <> 0, "+ave+",\"\"))"));
+	// sheet.addCell(new Formula(0, 2, "SUMIF("+ave+",\">0\")"));
+	// sheet.addCell(new Formula(0, 2, "SUM("+ave+")"));
+	sheet.addCell(new Formula(0, 2, "SUM("+ave_sum+")"+" / "+"COUNT(" + ave_count + ")"));
+	sheet.addCell(new Formula(0, 3, "COUNT(" + ave_count + ")"));
 
 	workbook.write();
 	workbook.close();
 	JOptionPane.showMessageDialog(null, "Готово");
     }
 
-    private void pro1(int column, int row, WritableSheet sheet)
+    private int pro1(int column, int row, WritableSheet sheet)
 	    throws RowsExceededException, WriteException, SQLException {
+
 	sheet.addCell(new Label(column, row, "ОАО \"Калуганефтепродукт\"",
 		font.tahoma9ptBoldMedion));
 	sheet.mergeCells(column, row, column + 11, row);
@@ -131,51 +185,234 @@ public class OutputSvod {
 	column = opt(column, row + 1, sheet, 1);
 
 	column = nadbavka(column, row + 1, sheet);
+	ave_k.add(column);
 	column = kaluga(column, row + 1, sheet, 1);
-	
+
 	column = oblast(column, row + 1, sheet, 1);
-	
-	column = vill(column, row + 1, sheet, 21, "г. Боровск");
+
+	column = vill(column, row + 1, sheet, 23, "г. Боровск");
+	column = vill(column, row + 1, sheet, 212, "г. Обнинск");
+	column = vill(column, row + 1, sheet, 58, "Жиздринский р-н");
+	column = vill(column, row + 1, sheet, 5, "Бабынинский р-н");
+	column = vill(column, row + 1, sheet, 40, "Дзержинский р-н");
+	column = vill(column, row + 1, sheet, 90, "Козельский р-н");
+
+	return column;
     }
-    
-    private int vill(int column, int row, WritableSheet sheet, int station_id, String title) throws SQLException, RowsExceededException, WriteException{
-	sheet.addCell(new Label(column, row, title,
-		font.tahomaValue));
-	
+
+    private int pro2(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ООО \"Газпромнефть-Центр\"",
+		font.tahoma9ptBoldMedion));
+	sheet.mergeCells(column, row, column + 9, row);
+
+	column = opt(column, row + 1, sheet, 2);
+
+	column = nadbavka(column, row + 1, sheet);
+	ave_k.add(column);
+	column = kaluga(column, row + 1, sheet, 2);
+
+	column = oblast(column, row + 1, sheet, 2);
+
+	column = vill(column, row + 1, sheet, 41, "Дзержинский р-н");
+	column = vill(column, row + 1, sheet, 85, "Износковский р-н");
+	column = vill(column, row + 1, sheet, 62, "Жиздринский р-н");
+	column = vill(column, row + 1, sheet, 14, "Бабынинский р-н");
+
+	return column;
+    }
+
+    private int pro3(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ООО ТД \"Альфа-Трейд\"",
+		font.tahoma9ptBoldMedion));
+	sheet.mergeCells(column, row, column + 1, row);
+
+	ave_k.add(column);
+	column = vill(column, row + 1, sheet, 195, "г. Калуга");
+	sheet.addCell(new Label(column, row + 1, "в т.ч. мини АЗС",
+		font.tahomaLabelTitle));
+	column++;
+	// column = vill(column, row + 1, sheet, 85,
+	// "!!неправильная АЗС!! в т.ч. мини АЗС");
+
+	return column;
+    }
+
+    private int pro4(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+
+	sheet.addCell(new Label(column, row,
+		"ООО \"Луйкойл-Центрнефтепродукт\"", font.tahoma9ptBoldMedion));
+	sheet.mergeCells(column, row, column + 1, row);
+	ave_k.add(column);
+	column = kaluga(column, row + 1, sheet, 3);
+	column = oblast(column, row + 1, sheet, 3);
+
+	return column;
+    }
+
+    private int pro5(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ИП Палашичев",
+		font.tahoma9ptBoldMedion));
+	sheet.mergeCells(column, row, column + 1, row);
+
+	ave_k.add(column);
+	column = vill(column, row + 1, sheet, 199, "г. Калуга");
+	column = vill(column, row + 1, sheet, 9, "Бабынинский р-н");
+
+	return column;
+    }
+
+    private int pro6(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ООО \"ТрансАЗС-Сервис\"",
+		font.tahoma9ptBoldMedion));
+
+	column = vill(column, row + 1, sheet, 215, "г. Обнинск");
+
+	return column;
+    }
+
+    private int pro7(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ООО \"Октан\"",
+		font.tahoma9ptBoldMedion));
+
+	column = vill(column, row + 1, sheet, 218, "г. Обнинск");
+
+	return column;
+    }
+
+    private int pro8(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ИП Пешков",
+		font.tahoma9ptBoldMedion));
+	sheet.mergeCells(column, row, column + 2, row);
+
+	column = vill(column, row + 1, sheet, 144, "Сухиничский р-н");
+	column = vill(column, row + 1, sheet, 155, "Ульяновский р-н");
+	column = vill(column, row + 1, sheet, 138, "Перемышельский р-н");
+
+	return column;
+    }
+
+    private int pro9(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ИП Журавлева",
+		font.tahoma9ptBoldMedion));
+
+	column = vill(column, row + 1, sheet, 13, "Барятинский р-н");
+
+	return column;
+    }
+
+    private int pro10(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ООО \"Березка\"",
+		font.tahoma9ptBoldMedion));
+
+	column = vill(column, row + 1, sheet, 86, "Износковский р-н");
+
+	return column;
+    }
+
+    private int pro11(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ООО \"Восток-Ойл\"",
+		font.tahoma9ptBoldMedion));
+	sheet.mergeCells(column, row, column + 3, row);
+
+	column = vill(column, row + 1, sheet, 133, "г. Мосальск");
+	column = vill(column, row + 1, sheet, 123, "Малоярославецкий р-н");
+	column = vill(column, row + 1, sheet, 130, "Мещовский р-н");
+	column = vill(column, row + 1, sheet, 94, "Куйбышевский р-н");
+
+	return column;
+    }
+
+    private int pro12(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ООО \"Солид\"",
+		font.tahoma9ptBoldMedion));
+
+	column = vill(column, row + 1, sheet, 157, "Ферзиковский р-н");
+
+	return column;
+    }
+
+    private int pro13(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ООО \"Экоресурс\"",
+		font.tahoma9ptBoldMedion));
+
+	column = vill(column, row + 1, sheet, 142, "Спас-Деменский р-н");
+
+	return column;
+    }
+
+    private int pro14(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "АЗС №50 ИП Белова",
+		font.tahoma9ptBoldMedion));
+
+	column = vill(column, row + 1, sheet, 161, "Хвастовичский р-н");
+
+	return column;
+    }
+
+    private int pro15(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException, SQLException {
+	sheet.addCell(new Label(column, row, "ОАО \"АЗС Хвастовичи\"",
+		font.tahoma9ptBoldMedion));
+
+	column = vill(column, row + 1, sheet, 160, "Хвастовичский р-н");
+
+	return column;
+    }
+
+    private int vill(int column, int row, WritableSheet sheet, int station_id,
+	    String title) throws SQLException, RowsExceededException,
+	    WriteException {
+	sheet.addCell(new Label(column, row, title, font.tahomaLabelTitle));
+
 	Vector<Integer> stationsComm = new Vector<Integer>();
 	stationsComm.add(station_id);
 	String[][] value = ave(stationsComm);
-	
+
 	osn(column, row + 1, sheet, value);
-	return column+1;
+	return column + 1;
     }
-    
-    private int nadbavka(int column, int row, WritableSheet sheet) throws RowsExceededException, WriteException{
+
+    private int nadbavka(int column, int row, WritableSheet sheet)
+	    throws RowsExceededException, WriteException {
 	sheet.addCell(new Label(column, row, "Размер надбавки % Калуга",
 		font.tahomaValue));
-	sheet.addCell(new Label(column+1, row, "Размер надбавки % Область",
+	sheet.addCell(new Label(column + 1, row, "Размер надбавки % Область",
 		font.tahomaValue));
 	row++;
 	for (int tau = 0; tau < time.length; tau++) {
 	    for (int i = 0; i < 4; i++) {
-		
-		String fl = toColumnExcel(column-1)+Integer.toString(row+tau*7+i+1);
-		String fkaluga = toColumnExcel(column+2)+Integer.toString(row+tau*7+i+1);
-		String foblast = toColumnExcel(column+3)+Integer.toString(row+tau*7+i+1);
-		
-		sheet.addCell(new Formula(column, row+tau*7+i, "IF(ISERROR(SUM("
-			+ fkaluga + "-" + fl + ") / "
-			+ fl + "),\"-\",SUM(" + fkaluga
-			+ "-" + fl + ") / " + fl
-			+ ")", font.tahomaValuePer));
-		sheet.addCell(new Formula(column+1, row+tau*7+i, "IF(ISERROR(SUM("
-			+ foblast + "-" + fl + ") / "
-			+ fl + "),\"-\",SUM(" + foblast
-			+ "-" + fl + ") / " + fl
-			+ ")", font.tahomaValuePer));
+
+		String fl = toColumnExcel(column - 1)
+			+ Integer.toString(row + tau * 7 + i + 1);
+		String fkaluga = toColumnExcel(column + 2)
+			+ Integer.toString(row + tau * 7 + i + 1);
+		String foblast = toColumnExcel(column + 3)
+			+ Integer.toString(row + tau * 7 + i + 1);
+
+		sheet.addCell(new Formula(column, row + tau * 7 + i,
+			"IF(ISERROR(SUM(" + fkaluga + "-" + fl + ") / " + fl
+				+ "),\"-\",SUM(" + fkaluga + "-" + fl + ") / "
+				+ fl + ")", font.tahomaValuePer));
+		sheet.addCell(new Formula(column + 1, row + tau * 7 + i,
+			"IF(ISERROR(SUM(" + foblast + "-" + fl + ") / " + fl
+				+ "),\"-\",SUM(" + foblast + "-" + fl + ") / "
+				+ fl + ")", font.tahomaValuePer));
 	    }
 	}
-	return column+2;
+	return column + 2;
     }
 
     private int kaluga(int column, int row, WritableSheet sheet, int commId)
@@ -210,7 +447,7 @@ public class OutputSvod {
 
 	return column + 1;
     }
-    
+
     private int oblast(int column, int row, WritableSheet sheet, int commId)
 	    throws RowsExceededException, WriteException, SQLException {
 
@@ -247,7 +484,7 @@ public class OutputSvod {
     private void osn(int column, int row, WritableSheet sheet, String[][] value)
 	    throws RowsExceededException, WriteException {
 	int index = 0;
-	
+
 	String[][] result = new String[2][4];
 
 	for (int tau = 0; tau < value.length; tau++) {
@@ -273,7 +510,7 @@ public class OutputSvod {
 	    }
 	}
 
-	index ++;
+	index++;
 
 	/**
 	 * составление формул Если нет ошибки записывается формула Если есть
@@ -281,18 +518,16 @@ public class OutputSvod {
 	 */
 	for (int i = 0; i < result[0].length; i++) {
 
-		sheet.addCell(new Formula(column, index, "IF(ISERROR(SUM("
-			+ result[1 ][i] + "-" + result[0 ][i] + ") / "
-			+ result[0][i] + "),\"-\",SUM(" + result[1][i]
-			+ "-" + result[0][i] + ") / " + result[0][i]
-			+ ")", font.tahomaValuePer));
+	    sheet.addCell(new Formula(column, index, "IF(ISERROR(SUM("
+		    + result[1][i] + "-" + result[0][i] + ") / " + result[0][i]
+		    + "),\"-\",SUM(" + result[1][i] + "-" + result[0][i]
+		    + ") / " + result[0][i] + ")", font.tahomaValuePer));
 
-		sheet.addCell(new Formula(column, index + 8,
-			"IF(ISERROR(SUM(" + result[1 ][i] + "-"
-				+ result[0][i] + ")),\"-\"," + "SUM("
-				+ result[1][i] + "-" + result[0][i] + "))",
-			font.tahomaValue));
-	    
+	    sheet.addCell(new Formula(column, index + 8, "IF(ISERROR(SUM("
+		    + result[1][i] + "-" + result[0][i] + ")),\"-\"," + "SUM("
+		    + result[1][i] + "-" + result[0][i] + "))",
+		    font.tahomaValue));
+
 	    index++;
 	}
     }
@@ -301,6 +536,7 @@ public class OutputSvod {
 	/**
 	 * Цены на каждой АЗС за весь период(квартал) - ОДНОГО ПОСТАВЩИКА
 	 */
+	Vector<String[]> all_b80 = new Vector<String[]>();
 	Vector<String[]> all_b95 = new Vector<String[]>();
 	Vector<String[]> all_b92 = new Vector<String[]>();
 	Vector<String[]> all_bdis = new Vector<String[]>();
@@ -317,17 +553,18 @@ public class OutputSvod {
 		    .getConnection("jdbc:sqlite:" + Oil.PATH)
 		    .createStatement()
 		    .executeQuery(
-			    "SELECT changedate, b95, b92, bdis FROM change WHERE station_id LIKE '"
+			    "SELECT changedate, b95, b92, bdis, b80 FROM change WHERE station_id LIKE '"
 				    + stationsComm.get(st) + "';");
 
 	    Vector<String[]> timeLine = new Vector<String[]>();
 	    while (stChange.next()) {
-		String[] change = new String[4];
+		String[] change = new String[5];
 
 		change[0] = stChange.getString("changedate");
 		change[1] = stChange.getString("b95");
 		change[2] = stChange.getString("b92");
 		change[3] = stChange.getString("bdis");
+		change[4] = stChange.getString("b80");
 
 		timeLine.add(0, change);
 	    }
@@ -340,6 +577,7 @@ public class OutputSvod {
 		/**
 		 * данные одной АЗС за квартал
 		 */
+		String[] data_b80 = new String[time.length];
 		String[] data_b95 = new String[time.length];
 		String[] data_b92 = new String[time.length];
 		String[] data_bdis = new String[time.length];
@@ -351,7 +589,7 @@ public class OutputSvod {
 		    /**
 		     * поиск записи, наиболее приблежённой к времени тау
 		     */
-		    String[] current_data = { "0", "0", "0", "0" };
+		    String[] current_data = { "0", "0", "0", "0", "0" };
 
 		    for (int p = 0; p < timeLine.size(); p++) {
 			if (Long.parseLong(timeLine.get(p)[0]) < time[tau]
@@ -364,6 +602,7 @@ public class OutputSvod {
 		    /**
 		     * сохранение найденного значения
 		     */
+		    data_b80[tau] = current_data[4];
 		    data_b95[tau] = current_data[1];
 		    data_b92[tau] = current_data[2];
 		    data_bdis[tau] = current_data[3];
@@ -372,6 +611,7 @@ public class OutputSvod {
 		/**
 		 * сохранение найденных значений АЗС за квартал
 		 */
+		all_b80.add(data_b80);
 		all_b95.add(data_b95);
 		all_b92.add(data_b92);
 		all_bdis.add(data_bdis);
@@ -385,6 +625,7 @@ public class OutputSvod {
 	/**
 	 * Среднее значение поставщика по каждому виду топлива
 	 */
+	double[] b80 = new double[time.length];
 	double[] b95 = new double[time.length];
 	double[] b92 = new double[time.length];
 	double[] bdis = new double[time.length];
@@ -393,6 +634,7 @@ public class OutputSvod {
 	 * обнуление значений, для вычисление средних значений
 	 */
 	for (int i = 0; i < time.length; i++) {
+	    b80[i] = 0f;
 	    b95[i] = 0f;
 	    b92[i] = 0f;
 	    bdis[i] = 0f;
@@ -403,11 +645,16 @@ public class OutputSvod {
 	 * недель)
 	 */
 	for (int station = 0; station < all_b95.size(); station++) {
+	    String[] temp_80 = all_b80.get(station);
 	    String[] temp_95 = all_b95.get(station);
 	    String[] temp_92 = all_b92.get(station);
 	    String[] temp_dis = all_bdis.get(station);
 
 	    for (int i = 0; i < time.length; i++) {
+		b80[i] = new BigDecimal(b80[i]
+			+ parseStringToDouble(temp_80[i])).setScale(2,
+			RoundingMode.HALF_UP).doubleValue();
+
 		b95[i] = new BigDecimal(b95[i]
 			+ parseStringToDouble(temp_95[i])).setScale(2,
 			RoundingMode.HALF_UP).doubleValue();
@@ -426,6 +673,8 @@ public class OutputSvod {
 	 * приведение к среднему значению(деление суммы на количество цен(АЗС))
 	 */
 	for (int i = 0; i < time.length; i++) {
+	    b80[i] = new BigDecimal(b80[i] / all_b80.size()).setScale(2,
+		    RoundingMode.HALF_UP).doubleValue();
 	    b95[i] = new BigDecimal(b95[i] / all_b95.size()).setScale(2,
 		    RoundingMode.HALF_UP).doubleValue();
 	    b92[i] = new BigDecimal(b92[i] / all_b92.size()).setScale(2,
@@ -436,10 +685,10 @@ public class OutputSvod {
 
 	String[][] result = new String[time.length][4];
 	for (int i = 0; i < time.length; i++) {
-	    result[i][0] = "-";
-	    result[i][1] = Double.toString(b92[i]);
-	    result[i][2] = Double.toString(b95[i]);
-	    result[i][3] = Double.toString(bdis[i]);
+	    result[i][0] = (b80[i] > 0) ? Double.toString(b80[i]) : "-";
+	    result[i][1] = (b92[i] > 0) ? Double.toString(b92[i]) : "-";
+	    result[i][2] = (b95[i] > 0) ? Double.toString(b95[i]) : "-";
+	    result[i][3] = (bdis[i] > 0) ? Double.toString(bdis[i]) : "-";
 	}
 	return result;
     }
@@ -608,7 +857,7 @@ public class OutputSvod {
      * @throws RowsExceededException
      * @throws WriteException
      */
-    private void cape(int column, int row, WritableSheet sheet)
+    private int cape(int column, int row, WritableSheet sheet)
 	    throws RowsExceededException, WriteException {
 
 	/**
@@ -641,12 +890,12 @@ public class OutputSvod {
 	sheet.addCell(new Label(column + 1, row, "Марка бензина",
 		font.tahoma9ptBoldMedion));
 	sheet.mergeCells(column + 1, row, column + 1, row + 1);
-	sheet.setColumnView(2, 10);
+	sheet.setColumnView(column + 1, 10);
 
 	/**
 	 * первая строчка под наименование поставщика
 	 */
-	sheet.setRowView(row, 600);
+	sheet.setRowView(row, 900);
 	/**
 	 * вторая строчка под пояснение выбранного значения
 	 */
@@ -706,6 +955,8 @@ public class OutputSvod {
 	     */
 	    nextRow += label_toplivo.length + 1;
 	}
+
+	return column + 2;
     }
 
     /**
@@ -782,9 +1033,9 @@ public class OutputSvod {
 	    try {
 		return Double.parseDouble(value);
 	    } catch (Exception e) {
-		JOptionPane.showMessageDialog(null,
-			"Ошибка; Позвонить Кириллу!");
-		System.exit(0);
+		// JOptionPane.showMessageDialog(null,
+		// "Ошибка; Позвонить Кириллу!");
+		// System.exit(0);
 		return 0.0;
 	    }
 	}

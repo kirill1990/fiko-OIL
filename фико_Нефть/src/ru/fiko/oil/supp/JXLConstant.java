@@ -3,6 +3,7 @@ package ru.fiko.oil.supp;
 import jxl.format.Alignment;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
+import jxl.format.Orientation;
 import jxl.format.VerticalAlignment;
 import jxl.write.NumberFormats;
 import jxl.write.WritableCellFormat;
@@ -19,6 +20,9 @@ public class JXLConstant {
 
     public WritableCellFormat tahomaLabelToplivo = new WritableCellFormat(
 	    new WritableFont(WritableFont.TAHOMA, 9, WritableFont.BOLD));
+    
+    public WritableCellFormat tahomaLabelTitle = new WritableCellFormat(
+	    new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD));
 
     public WritableCellFormat tahomaValue = new WritableCellFormat(
 	    NumberFormats.FLOAT);
@@ -42,6 +46,13 @@ public class JXLConstant {
 	tahomaValue.setWrap(true);
 	tahomaValue.setBorder(Border.ALL, BorderLineStyle.THIN);
 	tahomaValue.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD));
+	
+
+	tahomaLabelTitle.setAlignment(Alignment.CENTRE);
+	tahomaLabelTitle.setVerticalAlignment(VerticalAlignment.CENTRE);
+	tahomaLabelTitle.setWrap(true);
+	tahomaLabelTitle.setBorder(Border.ALL, BorderLineStyle.THIN);
+	tahomaLabelTitle.setOrientation(Orientation.PLUS_90);
 
 	tahomaValuePer.setAlignment(Alignment.CENTRE);
 	tahomaValuePer.setVerticalAlignment(VerticalAlignment.CENTRE);
