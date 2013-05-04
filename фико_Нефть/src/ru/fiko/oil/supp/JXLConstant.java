@@ -1,9 +1,13 @@
 package ru.fiko.oil.supp;
 
+import java.awt.Color;
+
 import jxl.format.Alignment;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
+import jxl.format.Colour;
 import jxl.format.Orientation;
+import jxl.format.UnderlineStyle;
 import jxl.format.VerticalAlignment;
 import jxl.write.NumberFormats;
 import jxl.write.WritableCellFormat;
@@ -26,6 +30,12 @@ public class JXLConstant {
 
     public WritableCellFormat tahomaValue = new WritableCellFormat(
 	    NumberFormats.FLOAT);
+    
+    public WritableCellFormat tahomaValue_red = new WritableCellFormat(
+	    NumberFormats.FLOAT);
+    
+    public WritableCellFormat tahomaValue_blue = new WritableCellFormat(
+	    NumberFormats.FLOAT);
 
     public WritableCellFormat tahomaValuePer = new WritableCellFormat(
 	    NumberFormats.PERCENT_FLOAT);
@@ -47,6 +57,18 @@ public class JXLConstant {
 	tahomaValue.setBorder(Border.ALL, BorderLineStyle.THIN);
 	tahomaValue.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD));
 	
+	tahomaValue_red.setAlignment(Alignment.CENTRE);
+	tahomaValue_red.setVerticalAlignment(VerticalAlignment.CENTRE);
+	tahomaValue_red.setWrap(true);
+	tahomaValue_red.setBorder(Border.ALL, BorderLineStyle.THIN);
+	tahomaValue_red.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.RED));
+	
+	tahomaValue_blue.setAlignment(Alignment.CENTRE);
+	tahomaValue_blue.setVerticalAlignment(VerticalAlignment.CENTRE);
+	tahomaValue_blue.setWrap(true);
+	tahomaValue_blue.setBorder(Border.ALL, BorderLineStyle.THIN);
+	tahomaValue_blue.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.BLUE));
+	
 
 	tahomaLabelTitle.setAlignment(Alignment.CENTRE);
 	tahomaLabelTitle.setVerticalAlignment(VerticalAlignment.CENTRE);
@@ -60,6 +82,7 @@ public class JXLConstant {
 	tahomaValuePer.setBorder(Border.ALL, BorderLineStyle.THIN);
 	tahomaValuePer.setFont(new WritableFont(WritableFont.TAHOMA, 9,
 		WritableFont.NO_BOLD));
+	
 
 	tahomaLabelToplivo.setAlignment(Alignment.LEFT);
 	tahomaLabelToplivo.setVerticalAlignment(VerticalAlignment.CENTRE);
