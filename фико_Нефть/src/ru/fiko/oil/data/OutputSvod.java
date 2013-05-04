@@ -196,7 +196,6 @@ public class OutputSvod {
 	    // sheet.addCell(new Formula(0, 2, "SUMIF("+ave+",\">0\")"));
 	    // sheet.addCell(new Formula(0, 2, "SUM("+ave+")"));
 
-	    System.out.println(average_obl);
 
 	    sheet.addCell(new Formula(column + 1, row + i_toplivo,
 		    "IF(ISERROR(" + averager + "),0," + averager + ")",
@@ -230,7 +229,7 @@ public class OutputSvod {
 	    if (sum.length() > 0)
 		sum += ",";
 
-	    count += "IF(" + toColumnExcel(columnNum) + rows + "<>0,"
+	    count += "IF(OR(" + toColumnExcel(columnNum) + rows + ">0,"+toColumnExcel(columnNum) + rows+"<0),"
 		    + toColumnExcel(columnNum) + rows + ",\"a\")";
 	    sum += "IF(ISNUMBER(" + toColumnExcel(columnNum) + rows + "),"
 		    + toColumnExcel(columnNum) + rows + ",0)";
@@ -251,7 +250,7 @@ public class OutputSvod {
 	    if (sum.length() > 0)
 		sum += ",";
 
-	    count += "IF(" + toColumnExcel(columnNum) + rows + "<>0,"
+	    count += "IF(OR(" + toColumnExcel(columnNum) + rows + ">0,"+toColumnExcel(columnNum) + rows+"<0),"
 		    + toColumnExcel(columnNum) + rows + ",\"a\")";
 	    sum += "IF(ISNUMBER(" + toColumnExcel(columnNum) + rows + "),"
 		    + toColumnExcel(columnNum) + rows + ",0)";
@@ -262,9 +261,10 @@ public class OutputSvod {
 
 	if (sum.length() > 0)
 	    sum += ",";
+	
 
-	count += "IF(" + region + "<>0," + region + ",\"a\")";
-	sum += "IF(ISNUMBER(" + region + ")," + region + ",0)";
+	count += "IF(OR(" + region + ">0 , "+region+"<0)," + region + ",\"a\")";
+	sum += "IF(ISERROR(" + region + "),0," + region + ")";
 
 	return "SUM(" + sum + ")" + " / " + "COUNT(" + count + ")";
     }
@@ -921,7 +921,7 @@ public class OutputSvod {
 			current_data[tau] = changeTimeLine.get(p);
 		    }
 		}
-System.out.println("dsgsdgdsgsdhfdshdfshdshdfsh");
+		
 		/**
 		 * занесение найденного значения
 		 */
