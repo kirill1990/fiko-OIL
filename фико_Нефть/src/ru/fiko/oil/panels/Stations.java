@@ -382,8 +382,6 @@ public class Stations extends JPanel {
 
 	    ItemStation item = new ItemStation();
 
-	    item.setThis(this);
-
 	    // id
 	    item.setStationId(rs.getString("id"));
 	    // id последнего изменения

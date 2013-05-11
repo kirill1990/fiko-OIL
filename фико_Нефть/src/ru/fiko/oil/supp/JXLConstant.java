@@ -36,6 +36,9 @@ public class JXLConstant {
     
     public WritableCellFormat tahomaValue_blue = new WritableCellFormat(
 	    NumberFormats.FLOAT);
+    
+    public WritableCellFormat tahomaValue_white = new WritableCellFormat(
+	    NumberFormats.FLOAT);
 
     public WritableCellFormat tahomaValuePer = new WritableCellFormat(
 	    NumberFormats.PERCENT_FLOAT);
@@ -68,6 +71,12 @@ public class JXLConstant {
 	tahomaValue_blue.setWrap(true);
 	tahomaValue_blue.setBorder(Border.ALL, BorderLineStyle.THIN);
 	tahomaValue_blue.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.BLUE));
+	
+	tahomaValue_white.setAlignment(Alignment.CENTRE);
+	tahomaValue_white.setVerticalAlignment(VerticalAlignment.CENTRE);
+	tahomaValue_white.setWrap(true);
+	tahomaValue_white.setBorder(Border.NONE, BorderLineStyle.THIN);
+	tahomaValue_white.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.WHITE));
 	
 
 	tahomaLabelTitle.setAlignment(Alignment.CENTRE);

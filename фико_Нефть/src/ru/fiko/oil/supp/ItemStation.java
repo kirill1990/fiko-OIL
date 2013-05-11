@@ -52,9 +52,6 @@ public class ItemStation extends JPanel
 
 	private JTextField			label_bdis;
 
-	private ItemStation	aaa;
-
-	private Stations	stations;
 
 	public void initialization()
 	{
@@ -115,7 +112,6 @@ public class ItemStation extends JPanel
 		toplivo.add(label_bdis);
 		
 		
-		aaa = this;
 		this.addMouseListener(new ads());
 
 	}
@@ -126,19 +122,14 @@ public class ItemStation extends JPanel
 		@Override
 		public void mouseClicked(MouseEvent e)
 		{
-			if(stations.current!=null)
-				stations.current.setColor(new Color(242,241,240));
-			
-			stations.current = aaa;
-			setColor(new Color(115,171,255));
+//			if(stations.current!=null)
+//				stations.current.setColor(new Color(242,241,240));
+//			
+//			stations.current = aaa;
+//			setColor(new Color(115,171,255));
 		}
 	}
 	
-	private void setColor(Color color)
-	{
-		//TODO comments
-		this.setBackground(color);
-	}
 
 	private class mmm extends KeyAdapter
 	{
@@ -319,10 +310,5 @@ public class ItemStation extends JPanel
 	public void setChangeId(String changeId)
 	{
 		this.changeId = changeId;
-	}
-
-	public void setThis(Stations stations)
-	{
-		this.stations = stations;
 	}
 }

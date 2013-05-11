@@ -37,8 +37,14 @@ public class OutputSvod {
     /**
      * Список всех марок топлива
      */
-    String[] label_toplivo = { "АИ-80", "АИ-92", "АИ-95", "ДТ/м-сез.",
-	    "ДТ/зим", "ДТ/лет", "ДТ/лет" };
+    String[] label_toplivo = {
+	    "АИ-80",
+	    "АИ-92",
+	    "АИ-95",
+	    "ДТ/м-сез.",
+	    "ДТ/зим",
+	    "ДТ/лет",
+	    "ДТ/лет" };
 
     JXLConstant font = new JXLConstant();
 
@@ -46,12 +52,8 @@ public class OutputSvod {
     Vector<Integer> ave_obl_reg = new Vector<Integer>();
     Vector<Integer> ave_obl_all = new Vector<Integer>();
 
-    private WritableWorkbook workbook;
-    private WritableSheet sheet;
-
     public OutputSvod() throws IOException, WriteException, ParseException,
 	    SQLException {
-
 	/**
 	 * Формирование дат отчетности
 	 */
@@ -62,7 +64,7 @@ public class OutputSvod {
 	long current = System.currentTimeMillis();
 
 	// TODO Заглушка времени
-	current = 1366920000000l + 86400000 - 1;
+	//current = 1366920000000l + 86400000 - 1;
 
 	/**
 	 * заполнение начинается с последнего элемента
@@ -111,9 +113,10 @@ public class OutputSvod {
 	// for (long index : time)
 	// System.out.println(new Date(index));
 
-	workbook = Workbook.createWorkbook(new File("svod_data.xls"));
+	WritableWorkbook workbook = Workbook.createWorkbook(new File(
+		"svod_data.xls"));
 
-	sheet = workbook.createSheet("Мнониторинг цен", 0);
+	WritableSheet sheet = workbook.createSheet("Мнониторинг цен", 0);
 	sheet.addCell(new Label(
 		0,
 		0,
@@ -127,146 +130,252 @@ public class OutputSvod {
 
 	column = cape(column, row, sheet);
 
+	// калуганефтепродукт
 	column = pro1(column, row, sheet);
+	// газпром
 	column = pro2(column, row, sheet);
+	// Альфа-трейд
 	column = pro3(column, row, sheet);
 
 	column = cape(column, row, sheet);
 
+	// лукойл
 	column = pro4(column, row, sheet);
+	// ИП палашичев
 	column = pro5(column, row, sheet);
+	// тран азс сервис
 	column = pro6(column, row, sheet);
+	// октан
 	column = pro7(column, row, sheet);
+	// ПИ пешков
 	column = pro8(column, row, sheet);
+	// ИП журавлева
 	column = pro9(column, row, sheet);
+	// березка
 	column = pro10(column, row, sheet);
+	// Восток ойл
 	column = pro11(column, row, sheet);
+	// солид
 	column = pro12(column, row, sheet);
+	// экоресурс
 	column = pro13(column, row, sheet);
+	// Белова
 	column = pro14(column, row, sheet);
+	// Хвастовичи
 	column = pro15(column, row, sheet);
-	ave(5, 65, sheet);
+	ave_result(5, 65, sheet);
 
 	workbook.write();
 	workbook.close();
 	JOptionPane.showMessageDialog(null, "Готово");
     }
 
-    private void ave(int column, int row, WritableSheet sheet)
+    /**
+     * Формирование таблицы "Изменение средней розничной цены"<br>
+     * <br>
+     * Номера колонок берутся из 3 массивов:<br>
+     * - ave_k - по городу Калуга<br>
+     * - ave_obl_all - розница в области по сетевым(Калуганефтепродукт,
+     * Газпромнефть и Лукойл)<br>
+     * - ave_obl_reg - розница в области по АЗС входяших в мониторинг<br>
+     * <br>
+     * <br>
+     * СРЗНАЧ по области берётся от СРЗНАЧ(СРЗНАЧ(мелких АЗС);
+     * Калуганефтепродукта; Газпромнефти; Лукойли)
+     * 
+     * @param column
+     *            - начальная колонка таблицы
+     * @param row
+     *            - начальная строка таблицы
+     * @param sheet
+     *            - в этот лист будет заносится таблица
+     * @throws RowsExceededException
+     * @throws WriteException
+     */
+    private void ave_result(int column, int row, WritableSheet sheet)
 	    throws RowsExceededException, WriteException {
 
+	/**
+	 * составление шапки
+	 */
 	sheet.addCell(new Label(column, row,
 		"Изменение средней розничной цены", font.tahomaValue));
-	sheet.mergeCells(column, row, column + 6, row);
-
-	row++;
+	sheet.mergeCells(column, row, column + 6, row++);
 
 	sheet.addCell(new Label(column, row, "г. Калуга", font.tahomaValue));
 	sheet.mergeCells(column, row, column + 2, row);
 
 	sheet.addCell(new Label(column + 4, row, "Калужская область",
 		font.tahomaValue));
-	sheet.mergeCells(column + 4, row, column + 6, row);
+	sheet.mergeCells(column + 4, row, column + 6, row++);
 
-	row++;
-
+	/*
+	 * обработка данных - формирование формул
+	 */
 	for (int i_toplivo = 0; i_toplivo < label_toplivo.length
 		&& i_toplivo < 4; i_toplivo++) {
 
+	    /**
+	     * Наименование топлива в описание строки
+	     */
 	    for (int i = 0; i < 2; i++)
 		sheet.addCell(new Label(column + i * 4, row + i_toplivo,
 			label_toplivo[i_toplivo], font.tahomaValue));
 
-	    String average = getFormulaAVERAGE(58 + i_toplivo, ave_k);
-	    String averager = getFormulaAVERAGE(50 + i_toplivo, ave_k);
+	    /**
+	     * Формирование формул СРЗНАЧ
+	     */
 
-	    String average_obl = getFormulaAVERAGEofAVERAGE(58 + i_toplivo,
-		    getFormulaAVERAGE(58 + i_toplivo, ave_obl_all), ave_obl_reg);
-	    String average_oblr = getFormulaAVERAGEofAVERAGE(50 + i_toplivo,
-		    getFormulaAVERAGE(50 + i_toplivo, ave_obl_all), ave_obl_reg);
+	    /**
+	     * По Калуге
+	     */
+	    // в процентах
+	    String average_kaluga_per = getFormulaAVERAGE(getFormulaCells(
+		    50 + i_toplivo, ave_k));
+	    // в рублях
+	    String average_kaluga_val = getFormulaAVERAGE(getFormulaCells(
+		    58 + i_toplivo, ave_k));
 
-	    // =СУММ(ЕСЛИ(ЕЧИСЛО(AF58);AF58;0);ЕСЛИ(ЕЧИСЛО(AD58);AD58;0))
-	    // sheet.addCell(new Formula(0, 2, "IF(ISERROR(AVERAGE(" + ave +
-	    // ")),\"-\",AVERAGE(" + ave + "))"));
-	    // sheet.addCell(new Formula(0, 2, "AVERAGE(" + ave + ")"));
-	    // sheet.addCell(new Formula(0, 2,
-	    // "AVERAGE(AF58,IF(ISNUMBER(AD58),AD58,\"asg\"))"));
-	    // sheet.addCell(new Formula(0, 2,
-	    // "AVERAGE(IF("+ave+" <> 0, "+ave+",\"\"))"));
-	    // sheet.addCell(new Formula(0, 2, "SUMIF("+ave+",\">0\")"));
-	    // sheet.addCell(new Formula(0, 2, "SUM("+ave+")"));
+	    /**
+	     * по области
+	     */
 
+	    // в процентах
 
+	    sheet.addCell(new Formula(
+		    column + 9,
+		    row + i_toplivo,
+		    getFormulaCOUNT(getFormulaCells(50 + i_toplivo, ave_obl_reg)),
+		    font.tahomaValue_white));
+
+	    sheet.addCell(new Formula(
+		    column + 8,
+		    row + i_toplivo,
+		    getFormulaSUM(getFormulaCells(50 + i_toplivo, ave_obl_reg)),
+		    font.tahomaValue_white));
+
+	    String div = toColumnExcel(column + 8) + (row + i_toplivo + 1)
+		    + "/" + toColumnExcel(column + 9) + (row + i_toplivo + 1);
+
+	    sheet.addCell(new Formula(column + 7, row + i_toplivo,
+		    "IF(ISERROR(" + div + "),0," + div + ")",
+		    font.tahomaValue_white));
+
+	    Vector<String> ave_obl_all_per = getFormulaCells(50 + i_toplivo,
+		    ave_obl_all);
+	    ave_obl_all_per.add(toColumnExcel(column + 7)
+		    + (row + i_toplivo + 1));
+
+	    String average_obl_per = getFormulaAVERAGE(ave_obl_all_per);
+
+	    // в рублях
+
+	    sheet.addCell(new Formula(
+		    column + 12,
+		    row + i_toplivo,
+		    getFormulaCOUNT(getFormulaCells(58 + i_toplivo, ave_obl_reg)),
+		    font.tahomaValue_white));
+
+	    sheet.addCell(new Formula(
+		    column + 11,
+		    row + i_toplivo,
+		    getFormulaSUM(getFormulaCells(58 + i_toplivo, ave_obl_reg)),
+		    font.tahomaValue_white));
+
+	    String div2 = toColumnExcel(column + 11) + (row + i_toplivo + 1)
+		    + "/" + toColumnExcel(column + 12) + (row + i_toplivo + 1);
+
+	    sheet.addCell(new Formula(column + 10, row + i_toplivo,
+		    "IF(ISERROR(" + div2 + "),0," + div2 + ")",
+		    font.tahomaValue_white));
+
+	    Vector<String> ave_obl_all_val = getFormulaCells(58 + i_toplivo,
+		    ave_obl_all);
+	    ave_obl_all_val.add(toColumnExcel(column + 10)
+		    + (row + i_toplivo + 1));
+
+	    String average_obl_val = getFormulaAVERAGE(ave_obl_all_val);
+
+	    /*
+	     * Запись формул в лист
+	     */
+
+	    /**
+	     * Калуга
+	     */
 	    sheet.addCell(new Formula(column + 1, row + i_toplivo,
-		    "IF(ISERROR(" + averager + "),0," + averager + ")",
-		    font.tahomaValuePer));
+		    "IF(ISERROR(" + average_kaluga_per + "),0,"
+			    + average_kaluga_per + ")", font.tahomaValuePer));
 
 	    sheet.addCell(new Formula(column + 2, row + i_toplivo,
-		    "IF(ISERROR(" + average + "),0," + average + ")",
-		    font.tahomaValue));
+		    "IF(ISERROR(" + average_kaluga_val + "),0,"
+			    + average_kaluga_val + ")", font.tahomaValue));
 
+	    /**
+	     * Область
+	     */
 	    sheet.addCell(new Formula(column + 5, row + i_toplivo,
-		    "IF(ISERROR(" + average_oblr + "),0," + average_oblr + ")",
-		    font.tahomaValuePer));
+		    "IF(ISERROR(" + average_obl_per + "),0," + average_obl_per
+			    + ")", font.tahomaValuePer));
+
 	    sheet.addCell(new Formula(column + 6, row + i_toplivo,
-		    "IF(ISERROR(" + average_obl + "),0," + average_obl + ")",
-		    font.tahomaValue));
-
-	    // sheet.addCell(new Formula(column, row + i_toplivo, "COUNT(" +
-	    // ave_count
-	    // + ")"));
+		    "IF(ISERROR(" + average_obl_val + "),0," + average_obl_val
+			    + ")", font.tahomaValue));
 	}
     }
 
-    private String getFormulaAVERAGE(int rows, Vector<Integer> ave_k) {
-	String sum = "";
+    /**
+     * Формирование формулы СРЗНАЧ<br>
+     * <br>
+     * Ячейка выбирается по след. принципу: ave_k[i].concat(rows)
+     * 
+     * @param rows
+     *            - строка, по которой делается СРЗНАЧ
+     * @param ave_k
+     *            - массив с номерами колонок
+     * @return формула СРЗНАЧ
+     */
+    private String getFormulaAVERAGE(Vector<String> ave_k) {
+
+	return getFormulaSUM(ave_k) + " / " + getFormulaCOUNT(ave_k);
+    }
+
+    private Vector<String> getFormulaCells(int rows, Vector<Integer> ave_k) {
+	Vector<String> result = new Vector<String>();
+
+	for (int columnNum : ave_k)
+	    result.add(toColumnExcel(columnNum) + rows);
+
+	return result;
+    }
+
+    private String getFormulaCOUNT(Vector<String> ave_k) {
 	String count = "";
 
-	for (int columnNum : ave_k) {
+	for (String column : ave_k) {
+
 	    if (count.length() > 0)
 		count += ",";
+
+	    count += "IF(OR(" + column + ">0," + column + "<0)," + column
+		    + ",\"a\")";
+	}
+
+	return "COUNT(" + count + ")";
+    }
+
+    private String getFormulaSUM(Vector<String> ave_k) {
+	String sum = "";
+
+	for (String column : ave_k) {
 
 	    if (sum.length() > 0)
 		sum += ",";
 
-	    count += "IF(OR(" + toColumnExcel(columnNum) + rows + ">0,"+toColumnExcel(columnNum) + rows+"<0),"
-		    + toColumnExcel(columnNum) + rows + ",\"a\")";
-	    sum += "IF(ISNUMBER(" + toColumnExcel(columnNum) + rows + "),"
-		    + toColumnExcel(columnNum) + rows + ",0)";
+	    sum += "IF(ISNUMBER(" + column + ")," + column + ",0)";
 	}
 
-	return "SUM(" + sum + ")" + " / " + "COUNT(" + count + ")";
-    }
-
-    private String getFormulaAVERAGEofAVERAGE(int rows, String region,
-	    Vector<Integer> ave_k) {
-	String sum = "";
-	String count = "";
-
-	for (int columnNum : ave_k) {
-	    if (count.length() > 0)
-		count += ",";
-
-	    if (sum.length() > 0)
-		sum += ",";
-
-	    count += "IF(OR(" + toColumnExcel(columnNum) + rows + ">0,"+toColumnExcel(columnNum) + rows+"<0),"
-		    + toColumnExcel(columnNum) + rows + ",\"a\")";
-	    sum += "IF(ISNUMBER(" + toColumnExcel(columnNum) + rows + "),"
-		    + toColumnExcel(columnNum) + rows + ",0)";
-	}
-
-	if (count.length() > 0)
-	    count += ",";
-
-	if (sum.length() > 0)
-	    sum += ",";
-	
-
-	count += "IF(OR(" + region + ">0 , "+region+"<0)," + region + ",\"a\")";
-	sum += "IF(ISERROR(" + region + "),0," + region + ")";
-
-	return "SUM(" + sum + ")" + " / " + "COUNT(" + count + ")";
+	return "SUM(" + sum + ")";
     }
 
     private int pro1(int column, int row, WritableSheet sheet)
@@ -281,10 +390,10 @@ public class OutputSvod {
 	column = nadbavka(column, row + 1, sheet);
 
 	ave_k.add(column);
-	column = kaluga(column, row + 1, sheet, 1);
+	column = vill(column, row + 1, sheet, 250, "г. Калуга розница");
 
 	ave_obl_all.add(column);
-	column = oblast(column, row + 1, sheet, 1);
+	column = vill(column, row + 1, sheet, 251, "Область розница");
 
 	column = vill(column, row + 1, sheet, 23, "г. Боровск");
 	column = vill(column, row + 1, sheet, 212, "г. Обнинск");
@@ -307,10 +416,10 @@ public class OutputSvod {
 	column = nadbavka(column, row + 1, sheet);
 
 	ave_k.add(column);
-	column = kaluga(column, row + 1, sheet, 2);
+	column = vill(column, row + 1, sheet, 252, "г. Калуга розница");
 
 	ave_obl_all.add(column);
-	column = oblast(column, row + 1, sheet, 2);
+	column = vill(column, row + 1, sheet, 253, "Область розница");
 
 	column = vill(column, row + 1, sheet, 41, "Дзержинский р-н");
 	column = vill(column, row + 1, sheet, 85, "Износковский р-н");
@@ -328,11 +437,10 @@ public class OutputSvod {
 
 	ave_k.add(column);
 	column = vill(column, row + 1, sheet, 195, "г. Калуга");
-	sheet.addCell(new Label(column, row + 1, "в т.ч. мини АЗС",
-		font.tahomaLabelTitle));
-	column++;
-	// column = vill(column, row + 1, sheet, 85,
-	// "!!неправильная АЗС!! в т.ч. мини АЗС");
+	// sheet.addCell(new Label(column, row + 1, "в т.ч. мини АЗС",
+	// font.tahomaLabelTitle));
+	// column++;
+	column = vill(column, row + 1, sheet, 254, "в т.ч. мини АЗС");
 
 	return column;
     }
@@ -345,10 +453,10 @@ public class OutputSvod {
 	sheet.mergeCells(column, row, column + 1, row);
 
 	ave_k.add(column);
-	column = kaluga(column, row + 1, sheet, 3);
+	column = vill(column, row + 1, sheet, 255, "г. Калуга розница");
 
 	ave_obl_all.add(column);
-	column = oblast(column, row + 1, sheet, 3);
+	column = vill(column, row + 1, sheet, 256, "Область розница");
 
 	return column;
     }
@@ -533,6 +641,7 @@ public class OutputSvod {
 	return column + 2;
     }
 
+    @SuppressWarnings("unused")
     private int kaluga(int column, int row, WritableSheet sheet, int commId)
 	    throws RowsExceededException, WriteException, SQLException {
 
@@ -566,6 +675,7 @@ public class OutputSvod {
 	return column + 1;
     }
 
+    @SuppressWarnings("unused")
     private int oblast(int column, int row, WritableSheet sheet, int commId)
 	    throws RowsExceededException, WriteException, SQLException {
 
@@ -624,7 +734,7 @@ public class OutputSvod {
 		    try {
 			double val = Double.valueOf(value[tau][i])
 				- Double.valueOf(value[tau - 1][i]);
-			
+
 			if (val > 0)
 			    sheet.addCell(new Label(column, row + i + tau * 7,
 				    toStr(value[tau][i]), font.tahomaValue_red));
@@ -732,7 +842,7 @@ public class OutputSvod {
 		    /**
 		     * поиск записи, наиболее приблежённой к времени тау
 		     */
-		    String[] current_data = { "0", "0", "0", "0", "0" };
+		    String[] current_data = { "0", "-", "-", "-", "-" };
 
 		    for (int p = 0; p < timeLine.size(); p++) {
 			if (Long.parseLong(timeLine.get(p)[0]) < time[tau]
@@ -815,16 +925,17 @@ public class OutputSvod {
 	/**
 	 * приведение к среднему значению(деление суммы на количество цен(АЗС))
 	 */
-	for (int i = 0; i < time.length; i++) {
-	    b80[i] = new BigDecimal(b80[i] / all_b80.size()).setScale(2,
-		    RoundingMode.HALF_UP).doubleValue();
-	    b95[i] = new BigDecimal(b95[i] / all_b95.size()).setScale(2,
-		    RoundingMode.HALF_UP).doubleValue();
-	    b92[i] = new BigDecimal(b92[i] / all_b92.size()).setScale(2,
-		    RoundingMode.HALF_UP).doubleValue();
-	    bdis[i] = new BigDecimal(bdis[i] / all_bdis.size()).setScale(2,
-		    RoundingMode.HALF_UP).doubleValue();
-	}
+	if (all_b80.size() > 0)
+	    for (int i = 0; i < time.length; i++) {
+		b80[i] = new BigDecimal(b80[i] / all_b80.size()).setScale(2,
+			RoundingMode.HALF_UP).doubleValue();
+		b95[i] = new BigDecimal(b95[i] / all_b95.size()).setScale(2,
+			RoundingMode.HALF_UP).doubleValue();
+		b92[i] = new BigDecimal(b92[i] / all_b92.size()).setScale(2,
+			RoundingMode.HALF_UP).doubleValue();
+		bdis[i] = new BigDecimal(bdis[i] / all_bdis.size()).setScale(2,
+			RoundingMode.HALF_UP).doubleValue();
+	    }
 
 	String[][] result = new String[time.length][4];
 	for (int i = 0; i < time.length; i++) {
@@ -890,17 +1001,18 @@ public class OutputSvod {
 	if (changeTimeLine.size() > 0) {
 
 	    String[][] result = new String[4][7];
-	    
+
 	    /**
-		 * поиск записи, наиболее приблежённой к времени тау
-		 */
-		String[][] current_data = new String[time.length][changeTimeLine.get(0).length];
+	     * поиск записи, наиболее приблежённой к времени тау
+	     */
+	    String[][] current_data = new String[time.length][changeTimeLine
+		    .get(0).length];
 
 	    /**
 	     * отсеивание лишних значений(не подходяших к времени тау)
 	     */
 	    for (int tau = 0; tau < time.length && changeTimeLine.size() > 0; tau++) {
-		
+
 		/**
 		 * минимальное время и => значения нет
 		 */
@@ -921,7 +1033,7 @@ public class OutputSvod {
 			current_data[tau] = changeTimeLine.get(p);
 		    }
 		}
-		
+
 		/**
 		 * занесение найденного значения
 		 */
@@ -936,51 +1048,64 @@ public class OutputSvod {
 
 			result[1][i - 1] = toColumnExcel(column + 1)
 				+ Integer.toString(row + i + tau * 7 + 1);
-			
-			 /**
-			     * тонны
-			     */
-			    sheet.addCell(new Label(column, row + i + tau * 7,
-				    toStr(current_data[tau][i]), font.tahomaValue));
-			    /**
-			     * литры
-			     */
-			    sheet.addCell(new Label(column + 1, row + i + tau * 7,
-				    toStr(current_data[tau][i + 7]), font.tahomaValue));
-		    }else{
-			 try {
-				double val = Double.valueOf((current_data[tau][i]))
-					- Double.valueOf((current_data[tau-1][i]));
-				double val2 = Double.valueOf((current_data[tau][i+7]))
-					- Double.valueOf((current_data[tau-1][i+7]));
-				
-				if (val > 0)
-				    sheet.addCell(new Label(column, row + i + tau * 7,
-					    toStr(current_data[tau][i]), font.tahomaValue_red));
-				else if (val < 0)
-				    sheet.addCell(new Label(column, row + i + tau * 7,
-					    toStr(current_data[tau][i]), font.tahomaValue_blue));
-				else
-				    sheet.addCell(new Label(column, row + i + tau * 7,
-					    toStr(current_data[tau][i]), font.tahomaValue));
-				
-				if (val2 > 0)
-				    sheet.addCell(new Label(column+1, row + i + tau * 7,
-					    toStr(current_data[tau][i+7]), font.tahomaValue_red));
-				else if (val2 < 0)
-				    sheet.addCell(new Label(column+1, row + i + tau * 7,
-					    toStr(current_data[tau][i+7]), font.tahomaValue_blue));
-				else
-				    sheet.addCell(new Label(column+1, row + i + tau * 7,
-					    toStr(current_data[tau][i+7]), font.tahomaValue));
 
-			    } catch (Exception e) {
-				sheet.addCell(new Label(column, row + i + tau * 7,
-					toStr(current_data[tau][i]), font.tahomaValue));
-				
-				sheet.addCell(new Label(column+1, row + i + tau * 7,
-					toStr(current_data[tau][i+7]), font.tahomaValue));
-			    }
+			/**
+			 * тонны
+			 */
+			sheet.addCell(new Label(column, row + i + tau * 7,
+				toStr(current_data[tau][i]), font.tahomaValue));
+			/**
+			 * литры
+			 */
+			sheet.addCell(new Label(column + 1, row + i + tau * 7,
+				toStr(current_data[tau][i + 7]),
+				font.tahomaValue));
+		    } else {
+			try {
+			    double val = Double.valueOf((current_data[tau][i]))
+				    - Double.valueOf((current_data[tau - 1][i]));
+			    double val2 = Double
+				    .valueOf((current_data[tau][i + 7]))
+				    - Double.valueOf((current_data[tau - 1][i + 7]));
+
+			    if (val > 0)
+				sheet.addCell(new Label(column, row + i + tau
+					* 7, toStr(current_data[tau][i]),
+					font.tahomaValue_red));
+			    else if (val < 0)
+				sheet.addCell(new Label(column, row + i + tau
+					* 7, toStr(current_data[tau][i]),
+					font.tahomaValue_blue));
+			    else
+				sheet.addCell(new Label(column, row + i + tau
+					* 7, toStr(current_data[tau][i]),
+					font.tahomaValue));
+
+			    if (val2 > 0)
+				sheet.addCell(new Label(column + 1, row + i
+					+ tau * 7,
+					toStr(current_data[tau][i + 7]),
+					font.tahomaValue_red));
+			    else if (val2 < 0)
+				sheet.addCell(new Label(column + 1, row + i
+					+ tau * 7,
+					toStr(current_data[tau][i + 7]),
+					font.tahomaValue_blue));
+			    else
+				sheet.addCell(new Label(column + 1, row + i
+					+ tau * 7,
+					toStr(current_data[tau][i + 7]),
+					font.tahomaValue));
+
+			} catch (Exception e) {
+			    sheet.addCell(new Label(column, row + i + tau * 7,
+				    toStr(current_data[tau][i]),
+				    font.tahomaValue));
+
+			    sheet.addCell(new Label(column + 1, row + i + tau
+				    * 7, toStr(current_data[tau][i + 7]),
+				    font.tahomaValue));
+			}
 		    }
 
 		    if (tau == time.length - 1) {
@@ -1025,7 +1150,7 @@ public class OutputSvod {
     }
 
     /**
-     * Создание аннотации
+     * Создание шапки с датами и марками топлива
      * 
      * @param column
      *            - номер первой колонки
