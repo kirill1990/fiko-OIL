@@ -64,13 +64,15 @@ public class JXLConstant {
 	tahomaValue_red.setVerticalAlignment(VerticalAlignment.CENTRE);
 	tahomaValue_red.setWrap(true);
 	tahomaValue_red.setBorder(Border.ALL, BorderLineStyle.THIN);
-	tahomaValue_red.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.RED));
+	tahomaValue_red.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD));
+//	tahomaValue_red.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.RED));
 	
 	tahomaValue_blue.setAlignment(Alignment.CENTRE);
 	tahomaValue_blue.setVerticalAlignment(VerticalAlignment.CENTRE);
 	tahomaValue_blue.setWrap(true);
 	tahomaValue_blue.setBorder(Border.ALL, BorderLineStyle.THIN);
-	tahomaValue_blue.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.BLUE));
+	tahomaValue_blue.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD));
+//	tahomaValue_blue.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.BLUE));
 	
 	tahomaValue_white.setAlignment(Alignment.CENTRE);
 	tahomaValue_white.setVerticalAlignment(VerticalAlignment.CENTRE);

@@ -81,26 +81,27 @@ public class OutputData {
 	clients();
 	grafics();
 
-	// String url = "http://fondim.kaluga.net/map_oil/upload.php";
-	String url = "http://localhost/map_oil/upload.php";
+	 String url = "http://fondim.kaluga.net/map_oil/upload.php";
+//	String url = "http://localhost/map_oil/upload.php";
 	String[] filename = new String[5];
 	filename[0] = "main.xml";
 	filename[1] = "providers.xml";
 	filename[2] = "regions.xml";
 	filename[3] = "clients.xml";
 	filename[4] = "grafics.xml";
-
-	for (int i = 0; i < filename.length; i++) {
-	    ArrayList<TestSer.Param> params = new ArrayList<TestSer.Param>();
-	    params.add(new Param("pass", "876954361"));
-
-	    ArrayList<TestSer.FileParam> fileParams = new ArrayList<TestSer.FileParam>();
-	    fileParams.add(new FileParam("filename", filename[i], new File(
-		    pathFolder + filename[i]), ""));
-
-	    TestSer aa = new TestSer(url, params, fileParams);
-	    aa.send();
-	}
+	
+	 for (int i = 0; i < filename.length; i++) {
+	 ArrayList<TestSer.Param> params = new ArrayList<TestSer.Param>();
+	 params.add(new Param("pass", "876954361"));
+	
+	 ArrayList<TestSer.FileParam> fileParams = new
+	 ArrayList<TestSer.FileParam>();
+	 fileParams.add(new FileParam("filename", filename[i], new File(
+	 pathFolder + filename[i]), ""));
+	
+	 TestSer aa = new TestSer(url, params, fileParams);
+	 aa.send();
+	 }
 
 	JOptionPane.showMessageDialog(null, "Готово");
     }
@@ -192,6 +193,8 @@ public class OutputData {
 	 * формирование значений цен результата для вывода
 	 */
 	for (int comm = 0; comm < commercial.length; comm++) {
+	    int count_det = 0;
+
 	    /**
 	     * хранит id всех АЗС одного сетевого поставщика
 	     */
@@ -204,11 +207,12 @@ public class OutputData {
 		    .getConnection("jdbc:sqlite:" + Oil.PATH)
 		    .createStatement()
 		    .executeQuery(
-			    "SELECT id FROM station WHERE comm_id LIKE '"
+			    "SELECT id,active FROM station WHERE comm_id LIKE '"
 				    + commercial[comm] + "';");
 
 	    while (bdStations.next()) {
-		stationsComm.add(bdStations.getInt("id"));
+		if (bdStations.getString("active").equals("true"))
+		    stationsComm.add(bdStations.getInt("id"));
 	    }
 	    bdStations.close();
 
@@ -259,6 +263,8 @@ public class OutputData {
 		    String[] data_b92 = new String[kvartal.length];
 		    String[] data_bdis = new String[kvartal.length];
 
+		    boolean blya = false;
+
 		    /**
 		     * Обработка данных
 		     */
@@ -276,6 +282,10 @@ public class OutputData {
 			    }
 			}
 
+			if (current_data[0].equals("0")) {
+			    blya = true;
+			}
+
 			/**
 			 * сохранение найденного значения
 			 */
@@ -284,15 +294,28 @@ public class OutputData {
 			data_bdis[tau] = current_data[3];
 		    }
 
-		    /**
-		     * сохранение найденных значений АЗС за квартал
-		     */
-		    all_b95.add(data_b95);
-		    all_b92.add(data_b92);
-		    all_bdis.add(data_bdis);
+//		    /**
+//		     * сохранение найденных значений АЗС за квартал
+//		     */
+//		    all_b95.add(data_b95);
+//		    all_b92.add(data_b92);
+//		    all_bdis.add(data_bdis);
+
+		    if (blya) {
+//			count_det++;
+			System.out.println("blya "+stationsComm.get(st));
+		    }else{
+			/**
+			 * сохранение найденных значений АЗС за квартал
+			 */
+			all_b95.add(data_b95);
+			all_b92.add(data_b92);
+			all_bdis.add(data_bdis);
+		    }
 		}
 	    }
 
+	    System.out.println("Размер 92 "+ all_b92.size());
 	    /**
 	     * Поиск среднего значения для сетевого поставщика
 	     */
@@ -326,28 +349,29 @@ public class OutputData {
 		    b95[i] = new BigDecimal(b95[i]
 			    + parseStringToDouble(temp_95[i])).setScale(2,
 			    RoundingMode.HALF_UP).doubleValue();
-
-		    b92[i] = new BigDecimal(b92[i]
-			    + parseStringToDouble(temp_92[i])).setScale(2,
-			    RoundingMode.HALF_UP).doubleValue();
+//		    if (comm == 0 && i == 0)
+			// System.out.println(b95[i]);
+			b92[i] = new BigDecimal(b92[i]
+				+ parseStringToDouble(temp_92[i])).setScale(2,
+				RoundingMode.HALF_UP).doubleValue();
 
 		    bdis[i] = new BigDecimal(bdis[i]
 			    + parseStringToDouble(temp_dis[i])).setScale(2,
 			    RoundingMode.HALF_UP).doubleValue();
 		}
 	    }
-
+	    
 	    /**
 	     * приведение к среднему значению(деление суммы на количество
 	     * цен(АЗС))
 	     */
 	    for (int i = 0; i < kvartal.length; i++) {
-		b95[i] = new BigDecimal(b95[i] / all_b95.size()).setScale(2,
-			RoundingMode.HALF_UP).doubleValue();
-		b92[i] = new BigDecimal(b92[i] / all_b92.size()).setScale(2,
-			RoundingMode.HALF_UP).doubleValue();
-		bdis[i] = new BigDecimal(bdis[i] / all_bdis.size()).setScale(2,
-			RoundingMode.HALF_UP).doubleValue();
+		b95[i] = new BigDecimal(b95[i] / (all_b95.size()))
+			.setScale(2, RoundingMode.HALF_UP).doubleValue();
+		b92[i] = new BigDecimal(b92[i] / (all_b95.size() ))
+			.setScale(2, RoundingMode.HALF_UP).doubleValue();
+		bdis[i] = new BigDecimal(bdis[i] / (all_b95.size()))
+			.setScale(2, RoundingMode.HALF_UP).doubleValue();
 	    }
 
 	    /**

@@ -41,10 +41,10 @@ public class OutputSvod {
 	    "АИ-80",
 	    "АИ-92",
 	    "АИ-95",
-	    "ДТ/м-сез.",
-	    "ДТ/зим",
 	    "ДТ/лет",
-	    "ДТ/лет" };
+	    "ДТ/лет",
+	    "ДТ/м-сез.",
+	    "ДТ/зим" };
 
     JXLConstant font = new JXLConstant();
 
@@ -64,7 +64,7 @@ public class OutputSvod {
 	long current = System.currentTimeMillis();
 
 	// TODO Заглушка времени
-	//current = 1366920000000l + 86400000 - 1;
+//	current = 1366920000000l + 86400000 - 1;
 
 	/**
 	 * заполнение начинается с последнего элемента
@@ -112,9 +112,11 @@ public class OutputSvod {
 
 	// for (long index : time)
 	// System.out.println(new Date(index));
+	
+	SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 
 	WritableWorkbook workbook = Workbook.createWorkbook(new File(
-		"svod_data.xls"));
+		"svod_data_"+formatter.format(new Date(System.currentTimeMillis()))+".xls"));
 
 	WritableSheet sheet = workbook.createSheet("Мнониторинг цен", 0);
 	sheet.addCell(new Label(
@@ -978,18 +980,18 @@ public class OutputSvod {
 	    change[1] = changeComm.getString("b80_t");
 	    change[2] = changeComm.getString("b92_t");
 	    change[3] = changeComm.getString("b95_t");
-	    change[4] = changeComm.getString("bdis_mc_t");
-	    change[5] = changeComm.getString("bdis_winter_t");
-	    change[6] = changeComm.getString("bdis_leto1_t");
-	    change[7] = changeComm.getString("bdis_leto2_t");
+	    change[4] = changeComm.getString("bdis_leto1_t");
+	    change[5] = changeComm.getString("bdis_leto2_t");
+	    change[6] = changeComm.getString("bdis_mc_t");
+	    change[7] = changeComm.getString("bdis_winter_t");
 
 	    change[8] = changeComm.getString("b80_l");
 	    change[9] = changeComm.getString("b92_l");
 	    change[10] = changeComm.getString("b95_l");
-	    change[11] = changeComm.getString("bdis_mc_l");
-	    change[12] = changeComm.getString("bdis_winter_l");
-	    change[13] = changeComm.getString("bdis_leto1_l");
-	    change[14] = changeComm.getString("bdis_leto2_l");
+	    change[11] = changeComm.getString("bdis_leto1_l");
+	    change[12] = changeComm.getString("bdis_leto2_l");
+	    change[13] = changeComm.getString("bdis_mc_l");
+	    change[14] = changeComm.getString("bdis_winter_l");
 
 	    changeTimeLine.add(0, change);
 	}
@@ -1266,7 +1268,7 @@ public class OutputSvod {
      */
     private String toStr(String str) {
 	String result = "";
-
+	if(str != null)
 	result = str.replace(".", ",");
 
 	return result;
