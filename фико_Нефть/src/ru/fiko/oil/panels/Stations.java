@@ -31,6 +31,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import ru.fiko.oil.data.OutputData;
+import ru.fiko.oil.data.OutputStations;
 import ru.fiko.oil.main.Oil;
 import ru.fiko.oil.supp.ComboItem;
 import ru.fiko.oil.supp.ItemStation;
@@ -154,11 +155,9 @@ public class Stations extends JPanel {
 		}
 	    });
 	}
+	
 	JButton btn = new JButton("Вывод в xml");
-	toolsPanel.add(btn, BorderLayout.EAST);
 	btn.addActionListener(new ActionListener() {
-
-	    @Override
 	    public void actionPerformed(ActionEvent arg0) {
 		try {
 		    outputDat();
@@ -167,6 +166,24 @@ public class Stations extends JPanel {
 		}
 	    }
 	});
+	
+	JButton btn2 = new JButton("Вывод списка АЗС");	
+	btn2.addActionListener(new ActionListener() {
+	    public void actionPerformed(ActionEvent arg0) {
+
+		try {
+		    new OutputStations(new Date(System.currentTimeMillis()));
+		    JOptionPane.showMessageDialog(null, "Готово");
+		}catch (Exception e) {
+		    e.printStackTrace();
+		}
+	    }
+	});
+	
+	JPanel btnpanel = new JPanel();
+	toolsPanel.add(btnpanel, BorderLayout.EAST);
+	btnpanel.add(btn2);
+	btnpanel.add(btn);
 
 	// Формирование информации о АЗС
 	refreshDataPanel();

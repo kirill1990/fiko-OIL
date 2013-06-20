@@ -23,6 +23,7 @@ import javax.xml.transform.TransformerException;
 
 import jxl.write.WriteException;
 
+import ru.fiko.oil.data.OutputStations;
 import ru.fiko.oil.panels.Citys;
 import ru.fiko.oil.panels.Districts;
 import ru.fiko.oil.panels.Main;
@@ -193,6 +194,8 @@ public class Oil extends JFrame {
 	conn.close();
 	// ConnectionToBD bd = new ConnectionToBD();
 	addTop();
+	
+	
 	new Oil();
 
 	// new OutputSvod();
@@ -230,7 +233,6 @@ public class Oil extends JFrame {
 	// }
 	// catch (ParseException e)
 	// {
-	// // TODO Auto-generated catch block
 	// e.printStackTrace();
 	// }
 	// DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
@@ -245,6 +247,11 @@ public class Oil extends JFrame {
 
     }
 
+    /**
+     * Добавление оптовых станций организаций в бд<br>
+     * 
+     * @throws SQLException
+     */
     private static void addTop() throws SQLException {
 	try {
 	    PreparedStatement pst = DriverManager.getConnection(

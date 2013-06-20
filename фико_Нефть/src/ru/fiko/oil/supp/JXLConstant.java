@@ -1,7 +1,5 @@
 package ru.fiko.oil.supp;
 
-import java.awt.Color;
-
 import jxl.format.Alignment;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
@@ -24,24 +22,33 @@ public class JXLConstant {
 
     public WritableCellFormat tahomaLabelToplivo = new WritableCellFormat(
 	    new WritableFont(WritableFont.TAHOMA, 9, WritableFont.BOLD));
-    
+
     public WritableCellFormat tahomaLabelTitle = new WritableCellFormat(
 	    new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD));
 
     public WritableCellFormat tahomaValue = new WritableCellFormat(
 	    NumberFormats.FLOAT);
-    
+
     public WritableCellFormat tahomaValue_red = new WritableCellFormat(
 	    NumberFormats.FLOAT);
-    
+
     public WritableCellFormat tahomaValue_blue = new WritableCellFormat(
 	    NumberFormats.FLOAT);
-    
+
     public WritableCellFormat tahomaValue_white = new WritableCellFormat(
 	    NumberFormats.FLOAT);
 
     public WritableCellFormat tahomaValuePer = new WritableCellFormat(
 	    NumberFormats.PERCENT_FLOAT);
+    
+    public WritableCellFormat tahomaTitle = new WritableCellFormat(
+	    new WritableFont(WritableFont.TAHOMA, 9, WritableFont.BOLD));
+    
+    public WritableCellFormat tahomaDistrict = new WritableCellFormat(
+	    new WritableFont(WritableFont.TAHOMA, 9, WritableFont.BOLD));
+    
+    public WritableCellFormat tahomaStation = new WritableCellFormat(
+	    new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD));
 
     public JXLConstant() throws WriteException {
 	/*
@@ -58,28 +65,34 @@ public class JXLConstant {
 	tahomaValue.setVerticalAlignment(VerticalAlignment.CENTRE);
 	tahomaValue.setWrap(true);
 	tahomaValue.setBorder(Border.ALL, BorderLineStyle.THIN);
-	tahomaValue.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD));
-	
+	tahomaValue.setFont(new WritableFont(WritableFont.TAHOMA, 9,
+		WritableFont.NO_BOLD));
+
 	tahomaValue_red.setAlignment(Alignment.CENTRE);
 	tahomaValue_red.setVerticalAlignment(VerticalAlignment.CENTRE);
 	tahomaValue_red.setWrap(true);
 	tahomaValue_red.setBorder(Border.ALL, BorderLineStyle.THIN);
-	tahomaValue_red.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD));
-//	tahomaValue_red.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.RED));
-	
+	tahomaValue_red.setFont(new WritableFont(WritableFont.TAHOMA, 9,
+		WritableFont.NO_BOLD));
+	// tahomaValue_red.setFont(new WritableFont(WritableFont.TAHOMA, 9,
+	// WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.RED));
+
 	tahomaValue_blue.setAlignment(Alignment.CENTRE);
 	tahomaValue_blue.setVerticalAlignment(VerticalAlignment.CENTRE);
 	tahomaValue_blue.setWrap(true);
 	tahomaValue_blue.setBorder(Border.ALL, BorderLineStyle.THIN);
-	tahomaValue_blue.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD));
-//	tahomaValue_blue.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.BLUE));
-	
+	tahomaValue_blue.setFont(new WritableFont(WritableFont.TAHOMA, 9,
+		WritableFont.NO_BOLD));
+	// tahomaValue_blue.setFont(new WritableFont(WritableFont.TAHOMA, 9,
+	// WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.BLUE));
+
 	tahomaValue_white.setAlignment(Alignment.CENTRE);
 	tahomaValue_white.setVerticalAlignment(VerticalAlignment.CENTRE);
 	tahomaValue_white.setWrap(true);
 	tahomaValue_white.setBorder(Border.NONE, BorderLineStyle.THIN);
-	tahomaValue_white.setFont(new WritableFont(WritableFont.TAHOMA, 9, WritableFont.NO_BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.WHITE));
-	
+	tahomaValue_white.setFont(new WritableFont(WritableFont.TAHOMA, 9,
+		WritableFont.NO_BOLD, false, UnderlineStyle.NO_UNDERLINE,
+		Colour.WHITE));
 
 	tahomaLabelTitle.setAlignment(Alignment.CENTRE);
 	tahomaLabelTitle.setVerticalAlignment(VerticalAlignment.CENTRE);
@@ -93,7 +106,6 @@ public class JXLConstant {
 	tahomaValuePer.setBorder(Border.ALL, BorderLineStyle.THIN);
 	tahomaValuePer.setFont(new WritableFont(WritableFont.TAHOMA, 9,
 		WritableFont.NO_BOLD));
-	
 
 	tahomaLabelToplivo.setAlignment(Alignment.LEFT);
 	tahomaLabelToplivo.setVerticalAlignment(VerticalAlignment.CENTRE);
@@ -104,6 +116,23 @@ public class JXLConstant {
 	tahoma14ptBold.setVerticalAlignment(VerticalAlignment.CENTRE);
 	tahoma14ptBold.setWrap(true);
 	tahoma14ptBold.setBorder(Border.NONE, BorderLineStyle.THIN);
+	
+	tahomaTitle.setAlignment(Alignment.CENTRE);
+	tahomaTitle.setVerticalAlignment(VerticalAlignment.CENTRE);
+	tahomaTitle.setWrap(true);
+	tahomaTitle.setBorder(Border.ALL, BorderLineStyle.THIN);
+	tahomaTitle.setBackground(Colour.GRAY_25);
+
+	tahomaDistrict.setAlignment(Alignment.LEFT);
+	tahomaDistrict.setVerticalAlignment(VerticalAlignment.CENTRE);
+	tahomaDistrict.setWrap(true);
+	tahomaDistrict.setBorder(Border.ALL, BorderLineStyle.THIN);
+	tahomaDistrict.setBackground(Colour.GRAY_25);
+	
+	tahomaStation.setAlignment(Alignment.LEFT);
+	tahomaStation.setVerticalAlignment(VerticalAlignment.CENTRE);
+	tahomaStation.setWrap(true);
+	tahomaStation.setBorder(Border.ALL, BorderLineStyle.THIN);
     }
 
 }
