@@ -15,7 +15,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Vector;
 
@@ -192,7 +191,7 @@ public class OutputData {
 	 * формирование значений цен результата для вывода
 	 */
 	for (int comm = 0; comm < commercial.length; comm++) {
-	    int count_det = 0;
+//	    int count_det = 0;
 
 	    /**
 	     * хранит id всех АЗС одного сетевого поставщика
